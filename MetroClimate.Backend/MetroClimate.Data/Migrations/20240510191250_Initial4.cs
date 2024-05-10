@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MetroClimate.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial2 : Migration
+    public partial class Initial4 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,8 +36,9 @@ namespace MetroClimate.Data.Migrations
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    user_id = table.Column<int>(type: "integer", nullable: false),
                     name = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    description = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    description = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -47,14 +48,30 @@ namespace MetroClimate.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "weather_forecasts",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    temperature_c = table.Column<int>(type: "integer", nullable: false),
+                    summary = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_weather_forecasts", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "sensors",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     station_id = table.Column<int>(type: "integer", nullable: false),
-                    name = table.Column<string>(type: "text", nullable: false),
-                    description = table.Column<string>(type: "text", nullable: false),
+                    name = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    description = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
                     type_id = table.Column<int>(type: "integer", nullable: true),
                     created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -122,6 +139,9 @@ namespace MetroClimate.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "station_readings");
+
+            migrationBuilder.DropTable(
+                name: "weather_forecasts");
 
             migrationBuilder.DropTable(
                 name: "sensor_types");

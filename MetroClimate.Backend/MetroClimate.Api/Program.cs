@@ -38,6 +38,7 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddTransient<IWeatherService, WeatherService>();
+builder.Services.AddTransient<IStationService, StationService>();
 builder.Services.AddTransient<DataSeeder>();
 
 

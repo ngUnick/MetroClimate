@@ -36,12 +36,13 @@ public class DataSeeder
         }
         
         await SeedMany<SensorType>(seedObject, "SensorType");
+        await SeedMany<Station>(seedObject, "Station");
+        await _dbContext.SaveChangesAsync();
     }
     private async Task SeedMany<T>(JObject seedObject, string key) where T : class
     {
         var entities = ((JArray) seedObject[key]!).ToObject<IList<T>>()!;
         
         await _dbContext.AddRangeAsync(entities);
-        await _dbContext.SaveChangesAsync();
     }
 }
