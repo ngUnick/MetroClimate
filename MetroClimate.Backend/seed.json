@@ -1,0 +1,14 @@
+{
+  "SensorType": 
+    [
+      {
+        "Id": 1,
+        "Name": "Temperature",
+        "Description": "Temperature Sensor",
+        "Unit": "Celsius",
+        "Symbol": "°C",
+        "MinValue": -50,
+        "MaxValue": 50
+      }
+    ]
+}

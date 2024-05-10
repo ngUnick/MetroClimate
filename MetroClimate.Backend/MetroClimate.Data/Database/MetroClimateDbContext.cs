@@ -7,6 +7,7 @@ using MetroClimate.Data.Common;
 using MetroClimate.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace MetroClimate.Data.Database;
 
@@ -20,6 +21,11 @@ public class MetroClimateDbContext : DbContext
     }
     
     public DbSet<WeatherForecast> WeatherForecasts { get; set; }
+    public DbSet<Station> Stations { get; set; }
+    public DbSet<Sensor> Sensors { get; set; }
+    public DbSet<SensorType> SensorTypes { get; set; }
+    public DbSet<StationReading> StationReadings { get; set; }
+    
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -38,6 +38,7 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddTransient<IWeatherService, WeatherService>();
+builder.Services.AddTransient<DataSeeder>();
 
 
 
@@ -59,6 +60,10 @@ if (app.Environment.IsDevelopment())
     // });
     //
     // await dbContext.SaveChangesAsync();
+    using var scope = app.Services.CreateScope();
+    var dataSeeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
+    await dataSeeder.Seed();
+    
 }
 
 app.UseHttpsRedirection();
