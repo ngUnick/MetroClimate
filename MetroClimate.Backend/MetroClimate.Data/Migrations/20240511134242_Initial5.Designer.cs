@@ -3,6 +3,7 @@ using System;
 using MetroClimate.Data.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MetroClimate.Data.Migrations
 {
     [DbContext(typeof(MetroClimateDbContext))]
-    partial class MetroClimateDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240511134242_Initial5")]
+    partial class Initial5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,8 +40,8 @@ namespace MetroClimate.Data.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
                         .HasColumnName("description");
 
                     b.Property<string>("Name")
@@ -47,13 +50,13 @@ namespace MetroClimate.Data.Migrations
                         .HasColumnType("character varying(10)")
                         .HasColumnName("name");
 
-                    b.Property<int>("SensorTypeId")
-                        .HasColumnType("integer")
-                        .HasColumnName("sensor_type_id");
-
                     b.Property<int>("StationId")
                         .HasColumnType("integer")
                         .HasColumnName("station_id");
+
+                    b.Property<int?>("TypeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("type_id");
 
                     b.Property<DateTime>("Updated")
                         .HasColumnType("timestamp with time zone")
@@ -62,11 +65,11 @@ namespace MetroClimate.Data.Migrations
                     b.HasKey("Id")
                         .HasName("pk_sensors");
 
-                    b.HasIndex("SensorTypeId")
-                        .HasDatabaseName("ix_sensors_sensor_type_id");
-
                     b.HasIndex("StationId")
                         .HasDatabaseName("ix_sensors_station_id");
+
+                    b.HasIndex("TypeId")
+                        .HasDatabaseName("ix_sensors_type_id");
 
                     b.ToTable("sensors", (string)null);
                 });
@@ -182,8 +185,8 @@ namespace MetroClimate.Data.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated");
 
-                    b.Property<double>("Value")
-                        .HasColumnType("double precision")
+                    b.Property<int>("Value")
+                        .HasColumnType("integer")
                         .HasColumnName("value");
 
                     b.HasKey("Id")
@@ -229,13 +232,6 @@ namespace MetroClimate.Data.Migrations
 
             modelBuilder.Entity("MetroClimate.Data.Models.Sensor", b =>
                 {
-                    b.HasOne("MetroClimate.Data.Models.SensorType", "SensorType")
-                        .WithMany()
-                        .HasForeignKey("SensorTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_sensors_sensor_types_sensor_type_id");
-
                     b.HasOne("MetroClimate.Data.Models.Station", "Station")
                         .WithMany("Sensors")
                         .HasForeignKey("StationId")
@@ -243,9 +239,14 @@ namespace MetroClimate.Data.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_sensors_stations_station_id");
 
-                    b.Navigation("SensorType");
+                    b.HasOne("MetroClimate.Data.Models.SensorType", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
+                        .HasConstraintName("fk_sensors_sensor_types_type_id");
 
                     b.Navigation("Station");
+
+                    b.Navigation("Type");
                 });
 
             modelBuilder.Entity("MetroClimate.Data.Models.StationReading", b =>

@@ -1,3 +1,4 @@
+using MetroClimate.Data.Dtos;
 using MetroClimate.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using MetroClimate.Services.Services;
@@ -6,11 +7,11 @@ namespace MetroClimate.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class SationController : ControllerBase
+public class StationController : ControllerBase
 {
     private readonly IStationService _stationService;
 
-    public SationController(ILogger<WeatherForecastController> logger, IStationService stationService)
+    public StationController(ILogger<WeatherForecastController> logger, IStationService stationService)
     {
         _stationService = stationService;
     }
@@ -20,4 +21,19 @@ public class SationController : ControllerBase
     {
         return await _stationService.GetUserStationsAsync(userId);
     }
+    
+    [HttpPost(Name = "SentStationReading")]
+    public async Task<IActionResult> SentStationReading(StationReadingPld reading)
+    {
+        var stationReading = new StationReading()
+        {
+            StationId = reading.StationId,
+            SensorId = reading.SensorId,
+            Value = reading.Value
+        };
+
+        await _stationService.RecordReadingAsync(stationReading);
+        return Ok();
+    }
+    
 }

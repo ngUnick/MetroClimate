@@ -33,7 +33,23 @@ public class MetroClimateDbContext : DbContext
 
         if (!string.IsNullOrWhiteSpace(_schema))
             modelBuilder.HasDefaultSchema(_schema);
-
+        
+        modelBuilder.Entity<StationReading>()
+            .HasOne(sr => sr.Station)
+            .WithMany(s => s.Readings)
+            .HasForeignKey(sr => sr.StationId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<Sensor>()
+            .HasOne(s => s.SensorType)
+            .WithMany()
+            .HasForeignKey(s => s.SensorTypeId);
+            
+            
+            
+            
+            
+            
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 

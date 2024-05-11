@@ -7,6 +7,7 @@ namespace MetroClimate.Services.Services;
 public interface IStationService
 {
     Task <List<Station>?> GetUserStationsAsync(int id);
+    Task RecordReadingAsync(StationReading reading);
 }
 
 public class StationService : IStationService
@@ -26,6 +27,12 @@ public class StationService : IStationService
             .Include(s => s.Readings)
             .Where(s => s.UserId == userId)
             .ToListAsync();
+    }
+    
+    public async Task RecordReadingAsync(StationReading reading)
+    {
+        _dbContext.StationReadings.Add(reading);
+        await _dbContext.SaveChangesAsync();
     }
     
 }
