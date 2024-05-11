@@ -4,5 +4,5 @@ public class StationReadingPld
 {
     public int StationId { get; set; }
     public int SensorId { get; set; }
-    public int Value { get; set; }
+    public double Value { get; set; }
 }
