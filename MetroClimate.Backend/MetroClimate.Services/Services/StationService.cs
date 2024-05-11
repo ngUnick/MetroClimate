@@ -1,4 +1,5 @@
 using MetroClimate.Data.Database;
+using MetroClimate.Data.Dtos;
 using MetroClimate.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +8,7 @@ namespace MetroClimate.Services.Services;
 public interface IStationService
 {
     Task <List<Station>?> GetUserStationsAsync(int id);
-    Task RecordReadingAsync(StationReading reading);
+    Task RecordReadingAsync(StationReadingPld reading);
 }
 
 public class StationService : IStationService
@@ -24,14 +25,33 @@ public class StationService : IStationService
     {
         return await _dbContext.Stations
             .Include(s => s.Sensors)
-            .Include(s => s.Readings)
             .Where(s => s.UserId == userId)
             .ToListAsync();
     }
     
-    public async Task RecordReadingAsync(StationReading reading)
+    public async Task RecordReadingAsync(StationReadingPld reading)
     {
-        _dbContext.StationReadings.Add(reading);
+        var sensor = await _dbContext.Sensors.FindAsync(reading.SensorId);
+        if(sensor == null)
+        {
+            var sensorType = await _dbContext.SensorTypes.FirstOrDefaultAsync(st => st.SensorTypeEnum == reading.SensorType);
+            sensor = new Sensor()
+            {
+                Id = reading.SensorId,
+                SensorType = sensorType,
+                StationId = reading.StationId
+            };
+            _dbContext.Sensors.Add(sensor);
+        }
+        
+        var stationReading = new StationReading()
+        {
+            StationId = reading.StationId,
+            SensorId = reading.SensorId,
+            Value = reading.Value
+        };
+        
+        _dbContext.StationReadings.Add(stationReading);
         await _dbContext.SaveChangesAsync();
     }
     

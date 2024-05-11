@@ -25,14 +25,9 @@ public class StationController : ControllerBase
     [HttpPost(Name = "SentStationReading")]
     public async Task<IActionResult> SentStationReading(StationReadingPld reading)
     {
-        var stationReading = new StationReading()
-        {
-            StationId = reading.StationId,
-            SensorId = reading.SensorId,
-            Value = reading.Value
-        };
+        
 
-        await _stationService.RecordReadingAsync(stationReading);
+        await _stationService.RecordReadingAsync(reading);
         return Ok();
     }
     

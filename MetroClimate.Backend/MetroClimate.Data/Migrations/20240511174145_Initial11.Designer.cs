@@ -3,6 +3,7 @@ using System;
 using MetroClimate.Data.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MetroClimate.Data.Migrations
 {
     [DbContext(typeof(MetroClimateDbContext))]
-    partial class MetroClimateDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240511174145_Initial11")]
+    partial class Initial11
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,10 +100,6 @@ namespace MetroClimate.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("name");
-
-                    b.Property<int>("SensorTypeEnum")
-                        .HasColumnType("integer")
-                        .HasColumnName("sensor_type_enum");
 
                     b.Property<string>("Symbol")
                         .IsRequired()
@@ -191,9 +190,6 @@ namespace MetroClimate.Data.Migrations
                     b.HasKey("Id")
                         .HasName("pk_station_readings");
 
-                    b.HasIndex("SensorId")
-                        .HasDatabaseName("ix_station_readings_sensor_id");
-
                     b.HasIndex("StationId")
                         .HasDatabaseName("ix_station_readings_station_id");
 
@@ -255,32 +251,20 @@ namespace MetroClimate.Data.Migrations
 
             modelBuilder.Entity("MetroClimate.Data.Models.StationReading", b =>
                 {
-                    b.HasOne("MetroClimate.Data.Models.Sensor", "Sensor")
-                        .WithMany("Readings")
-                        .HasForeignKey("SensorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_station_readings_sensors_sensor_id");
-
                     b.HasOne("MetroClimate.Data.Models.Station", "Station")
-                        .WithMany()
+                        .WithMany("Readings")
                         .HasForeignKey("StationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_station_readings_stations_station_id");
 
-                    b.Navigation("Sensor");
-
                     b.Navigation("Station");
-                });
-
-            modelBuilder.Entity("MetroClimate.Data.Models.Sensor", b =>
-                {
-                    b.Navigation("Readings");
                 });
 
             modelBuilder.Entity("MetroClimate.Data.Models.Station", b =>
                 {
+                    b.Navigation("Readings");
+
                     b.Navigation("Sensors");
                 });
 #pragma warning restore 612, 618

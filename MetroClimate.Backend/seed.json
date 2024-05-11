@@ -12,16 +12,6 @@
         "Description": "Station 2 Description"
       }
     ],
-  "Sensor": 
-    [
-      {
-        "Id": 1,
-        "Name": "Sensor 1",
-        "Description": "Sensor 1 Description",
-        "StationId": 1,
-        "SensorTypeId": 1
-      }
-    ],
   "SensorType": 
     [
       {
@@ -29,6 +19,7 @@
         "Name": "Temperature",
         "Description": "Temperature Sensor",
         "Unit": "Celsius",
+        "SensorTypeEnum": 0,
         "Symbol": "°C",
         "MinValue": -50,
         "MaxValue": 50

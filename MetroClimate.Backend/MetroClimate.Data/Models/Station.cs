@@ -12,7 +12,6 @@ public class Station : IRecordable
     [MaxLength(50)]
     public required string Description { get; set; }
     public List<Sensor>? Sensors { get; set; }
-    public List<StationReading>? Readings { get; set; }
     public DateTime Created { get; set; }
     public DateTime Updated { get; set; }
 }
