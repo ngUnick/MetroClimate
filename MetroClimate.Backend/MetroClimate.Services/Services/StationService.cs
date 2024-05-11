@@ -24,7 +24,8 @@ public class StationService : IStationService
     public async Task<List<Station>?> GetUserStationsAsync(int userId)
     {
         return await _dbContext.Stations
-            .Include(s => s.Sensors)
+            .Include(s => s.Sensors)!
+            .ThenInclude(s => s.Readings)
             .Where(s => s.UserId == userId)
             .ToListAsync();
     }
@@ -35,18 +36,24 @@ public class StationService : IStationService
         if(sensor == null)
         {
             var sensorType = await _dbContext.SensorTypes.FirstOrDefaultAsync(st => st.SensorTypeEnum == reading.SensorType);
+            if (sensorType == null)
+            {
+                throw new Exception("Sensor type not found");
+            }
+            
+            
             sensor = new Sensor()
             {
                 Id = reading.SensorId,
                 SensorType = sensorType,
-                StationId = reading.StationId
+                StationId = (int)reading.StationId
             };
             _dbContext.Sensors.Add(sensor);
         }
         
         var stationReading = new StationReading()
         {
-            StationId = reading.StationId,
+            StationId = (int)reading.StationId,
             SensorId = reading.SensorId,
             Value = reading.Value
         };

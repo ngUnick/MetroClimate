@@ -25,8 +25,11 @@ public class StationController : ControllerBase
     [HttpPost(Name = "SentStationReading")]
     public async Task<IActionResult> SentStationReading(StationReadingPld reading)
     {
-        
-
+        if (!ModelState.IsValid)
+        {
+            // This manually triggers the custom InvalidModelStateResponseFactory logic.
+            return ValidationProblem(ModelState);
+        }
         await _stationService.RecordReadingAsync(reading);
         return Ok();
     }
