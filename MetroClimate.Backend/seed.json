@@ -3,11 +3,13 @@
     [
       {
         "Id": 1,
+        "UserId": 1,
         "Name": "Station 1",
         "Description": "Station 1 Description"
       },
       {
         "Id": 2,
+        "UserId": 1,
         "Name": "Station 2",
         "Description": "Station 2 Description"
       }
