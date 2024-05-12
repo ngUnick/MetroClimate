@@ -31,6 +31,8 @@ public class ExceptionFilter : IExceptionFilter
         {
             StatusCode = 500
         };
+        
+        _logger.LogError(context.Exception, context.Exception.Message);
 
         context.Result = result;
         context.ExceptionHandled = true;

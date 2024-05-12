@@ -14,6 +14,10 @@ public class StationReadingValidator : AbstractValidator<StationReadingPld>
         RuleFor(x => x.SensorId)
             .NotEmpty();
 
+        RuleFor(x => x.SensorName)
+            .NotEmpty()
+            .Length(1, 15);
+
         RuleFor(x => x.SensorType)
             .IsInEnum();
         

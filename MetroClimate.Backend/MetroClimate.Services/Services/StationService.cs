@@ -7,7 +7,7 @@ namespace MetroClimate.Services.Services;
 
 public interface IStationService
 {
-    Task <List<Station>?> GetUserStationsAsync(int id);
+    Task <List<StationDto>?> GetUserStationsAsync(int id);
     Task RecordReadingAsync(StationReadingPld reading);
 }
 
@@ -21,13 +21,20 @@ public class StationService : IStationService
     }
 
 
-    public async Task<List<Station>?> GetUserStationsAsync(int userId)
+    public async Task<List<StationDto>?> GetUserStationsAsync(int userId)
     {
-        return await _dbContext.Stations
+        var station = await _dbContext.Stations
             .Include(s => s.Sensors)!
             .ThenInclude(s => s.Readings)
+            .Include(s => s.Sensors)!
+            .ThenInclude(s => s.SensorType)
             .Where(s => s.UserId == userId)
             .ToListAsync();
+        
+        var stationDtos = station.Select(s => new StationDto(s)).ToList();
+        
+        return stationDtos;
+        
     }
     
     public async Task RecordReadingAsync(StationReadingPld reading)
@@ -46,6 +53,7 @@ public class StationService : IStationService
             {
                 Id = reading.SensorId,
                 SensorType = sensorType,
+                Name = reading.SensorName,
                 StationId = (int)reading.StationId
             };
             _dbContext.Sensors.Add(sensor);

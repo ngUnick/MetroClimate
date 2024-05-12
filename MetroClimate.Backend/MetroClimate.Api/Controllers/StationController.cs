@@ -21,7 +21,7 @@ public class StationController : ControllerBase
     }
 
     [HttpGet(Name = "GetUserStations")] // "userId" is a placeholder for the actual user id
-    public async Task<IEnumerable<Station>?> Get(int userId)
+    public async Task<IEnumerable<StationDto>?> Get(int userId)
     {
         return await _stationService.GetUserStationsAsync(userId);
     }

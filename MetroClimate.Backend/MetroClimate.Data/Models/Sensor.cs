@@ -9,7 +9,7 @@ public class Sensor : IRecordable
     public int Id { get; set; }
     public int StationId { get; set; }
     public int SensorTypeId { get; set; }
-    [MaxLength(10)]
+    [MaxLength(15)]
     public string? Name { get; set; }
     [MaxLength(30)]
     public string? Description { get; set; }
