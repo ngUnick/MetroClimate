@@ -14,6 +14,9 @@ public class ApiResponse<T> : ApiResponse
     {
         Data = data;
     }
+    
+    public ApiResponse(ErrorCode error, string message, ValidationResult validationResult) : base(error, message, validationResult)
+    { }
 
 }
 

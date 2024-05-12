@@ -37,7 +37,7 @@ void loop() {
       HTTPClient http;
       String postData = "{\"StationId\": 1, \"SensorId\": 1, \"Value\": " + String((double)temperatureC) + ",\"SensorType\": 0, \"SensorName\": \"Temperature\"}";
 
-      http.begin(wifiClient, "http://" + String(server_ip) + ":" + String(server_port) + "/Station");
+      http.begin(wifiClient, "http://" + String(server_ip) + ":" + String(server_port) + "/Reading");
       http.addHeader("Content-Type", "application/json");
 
       int httpCode = http.POST(postData);

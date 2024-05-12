@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using MetroClimate.Data.Common;
 using MetroClimate.Data.Constants;
 using MetroClimate.Data.Dtos;
+using MetroClimate.Data.Dtos.Payload;
 using MetroClimate.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using MetroClimate.Services.Services;
@@ -21,23 +22,16 @@ public class StationController : ControllerBase
     }
 
     [HttpGet(Name = "GetUserStations")] // "userId" is a placeholder for the actual user id
-    public async Task<IEnumerable<StationDto>?> Get(int userId)
+    public async Task<ApiResponse<IEnumerable<StationDto>?>> Get([FromQuery] GetStationsPld payload)
     {
-        return await _stationService.GetUserStationsAsync(userId);
-    }
-    
-    [HttpPost(Name = "SentStationReading")]
-    public async Task<ApiResponse> SentStationReading(StationReadingPld reading)
-    {
-        var validator = new StationReadingValidator();
-        var validationResult = await validator.ValidateAsync(reading);
+        var validator = new GetStationsValidator();
+        var validationResult = await validator.ValidateAsync(payload);
         if (!validationResult.IsValid)
         {
-            return new ApiResponse(ErrorCode.BadRequest, "Invalid data", validationResult);
+            return new ApiResponse<IEnumerable<StationDto>?>(ErrorCode.BadRequest, "Invalid data", validationResult);
         }
-
-        await _stationService.RecordReadingAsync(reading);
-        return new ApiResponse();
+        return new ApiResponse<IEnumerable<StationDto>?>(await _stationService.GetUserStationsAsync(payload.UserId));
     }
+    
     
 }

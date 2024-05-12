@@ -1,17 +1,27 @@
 using FluentValidation;
+using MetroClimate.Data.Database;
 using MetroClimate.Data.Dtos;
+using MetroClimate.Data.Dtos.Payload;
+using Microsoft.EntityFrameworkCore;
 
 namespace MetroClimate.Services.Validator;
 
 public class StationReadingValidator : AbstractValidator<StationReadingPld>
 {
-    public StationReadingValidator()
+    public StationReadingValidator(MetroClimateDbContext dbContext)
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
         RuleFor(x => x.StationId)
-            .NotEmpty();
+            .NotNull()
+            .NotEmpty()
+            .MustAsync(async (stationId, cancellationToken) =>
+            {
+                return await dbContext!.Stations.AnyAsync(s => s.Id == stationId, cancellationToken);
+            })
+            .WithMessage("Station not found");
         
         RuleFor(x => x.SensorId)
+            .NotNull()
             .NotEmpty();
 
         RuleFor(x => x.SensorName)

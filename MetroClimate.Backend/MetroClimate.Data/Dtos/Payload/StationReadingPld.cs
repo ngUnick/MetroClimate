@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using MetroClimate.Data.Constants;
 
-namespace MetroClimate.Data.Dtos;
+namespace MetroClimate.Data.Dtos.Payload;
 
 public class StationReadingPld
 {

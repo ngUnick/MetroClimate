@@ -1,17 +1,13 @@
 using System.Reflection;
 using FluentValidation;
-using MetroClimate.Data.Common;
-using MetroClimate.Data.Constants;
 using MetroClimate.Data.Database;
 using MetroClimate.Data.Extensions;
-using MetroClimate.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MetroClimate.Services.Extensions;
 using MetroClimate.Services.Services;
 using Newtonsoft.Json;
 using StackExchange.Redis;
-using FluentValidation;
 using MetroClimate.Data.Filters;
 
 
@@ -52,6 +48,7 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddTransient<IWeatherService, WeatherService>();
 builder.Services.AddTransient<IStationService, StationService>();
+builder.Services.AddTransient<IReadingService, ReadingService>();
 builder.Services.AddTransient<DataSeeder>();
 
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
