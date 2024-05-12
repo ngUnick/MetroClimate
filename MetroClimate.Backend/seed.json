@@ -1,0 +1,27 @@
+{
+  "Station": 
+    [
+      {
+        "Id": 1,
+        "Name": "Station 1",
+        "Description": "Station 1 Description"
+      },
+      {
+        "Id": 2,
+        "Name": "Station 2",
+        "Description": "Station 2 Description"
+      }
+    ],
+  "SensorType": 
+    [
+      {
+        "Id": 1,
+        "Name": "Temperature",
+        "Description": "Temperature Sensor",
+        "Unit": "Celsius",
+        "Symbol": "°C",
+        "MinValue": -50,
+        "MaxValue": 50
+      }
+    ]
+}

@@ -1,0 +1,71 @@
+services:
+  
+  redis:
+    container_name: metro_climate_redis
+    image: redis/redis-stack:latest
+    ports:
+      - "8391:6379"
+      - "8382:8001"
+    networks:
+      - metro_climate
+    profiles:
+      - dev
+
+  db:
+    container_name: metro_climate_db
+    image: "postgres:14.2"
+    environment:
+      POSTGRES_USER: metro_climate
+      POSTGRES_PASSWORD: metro_climate
+      POSTGRES_DB: metro_climate_db
+    ports:
+      - "8442:5432"
+    networks:
+      - metro_climate
+    profiles:
+      - dev
+
+  pgadmin:
+    container_name: metro_climate_pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_DEFAULT_EMAIL: "admin@admin.com"
+      PGADMIN_DEFAULT_PASSWORD: "admin"
+      PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: "40"
+      GUNICORN_ACCESS_LOGFILE: '/dev/null'
+      GUNICORN_TIMEOUT: "30"
+    ports:
+      - "50001:80"
+    entrypoint: /bin/sh -c "chmod 600 /pgpass; /entrypoint.sh;"
+    user: root
+    networks:
+      - metro_climate
+    profiles:
+      - dev
+    configs:
+      - source: servers.json
+        target: /pgadmin4/servers.json
+      - source: pgpass
+        target: /pgpass
+
+
+networks:
+  metro_climate:
+
+configs:
+  pgpass:
+    content: db:5432:*:metro_climate:metro_climate
+  servers.json:
+    content: |
+      {"Servers": {"1": {
+        "Group": "Servers",
+        "Name": "Metro Climate Postgres",
+        "Host": "db",
+        "Port": 5432,
+        "MaintenanceDB": "postgres",
+        "Username": "metro_climate",
+        "PassFile": "/pgpass",
+        "SSLMode": "prefer"
+      }}}
