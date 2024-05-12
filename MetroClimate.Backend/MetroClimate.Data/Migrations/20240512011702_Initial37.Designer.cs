@@ -3,6 +3,7 @@ using System;
 using MetroClimate.Data.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MetroClimate.Data.Migrations
 {
     [DbContext(typeof(MetroClimateDbContext))]
-    partial class MetroClimateDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240512011702_Initial37")]
+    partial class Initial37
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,10 +146,6 @@ namespace MetroClimate.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("description");
-
-                    b.Property<DateTime>("LastReceived")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_received");
 
                     b.Property<string>("Name")
                         .IsRequired()

@@ -3,11 +3,13 @@
     [
       {
         "Id": 1,
+        "UserId": 1,
         "Name": "Station 1",
         "Description": "Station 1 Description"
       },
       {
         "Id": 2,
+        "UserId": 1,
         "Name": "Station 2",
         "Description": "Station 2 Description"
       }
@@ -19,9 +21,22 @@
         "Name": "Temperature",
         "Description": "Temperature Sensor",
         "Unit": "Celsius",
+        "SensorTypeEnum": 0,
         "Symbol": "°C",
         "MinValue": -50,
-        "MaxValue": 50
+        "MaxValue": 50,
+        "Formula": null
+      },
+      {
+          "Id": 2,
+          "Name": "Temperature F",
+          "Description": "Temperature Sensor Fahrenheit",
+          "Unit": "Fahrenheit",
+          "SensorTypeEnum": 0,
+          "Symbol": "°F",
+          "MinValue": -58,
+          "MaxValue": 122,
+          "Formula": "x * 9 / 5 + 32"
       }
     ]
 }

@@ -3,6 +3,7 @@ using System;
 using MetroClimate.Data.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MetroClimate.Data.Migrations
 {
     [DbContext(typeof(MetroClimateDbContext))]
-    partial class MetroClimateDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240512003247_Initial35")]
+    partial class Initial35
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,11 +87,6 @@ namespace MetroClimate.Data.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("description");
 
-                    b.Property<string>("Formula")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("formula");
-
                     b.Property<int>("MaxValue")
                         .HasColumnType("integer")
                         .HasColumnName("max_value");
@@ -143,10 +141,6 @@ namespace MetroClimate.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("description");
-
-                    b.Property<DateTime>("LastReceived")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_received");
 
                     b.Property<string>("Name")
                         .IsRequired()
