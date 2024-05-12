@@ -57,7 +57,6 @@ public class ReadingService : IReadingService
             };
             sensor.Station = (await _dbContext.Stations.FirstOrDefaultAsync(s => s.Id == reading.StationId))!;
             _dbContext.Sensors.Add(sensor);
-            await _dbContext.SaveChangesAsync();
         }
         
         var stationReading = new StationReading()
