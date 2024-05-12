@@ -14,4 +14,5 @@ public class Station : IRecordable
     public List<Sensor>? Sensors { get; set; }
     public DateTime Created { get; set; }
     public DateTime Updated { get; set; }
+    public DateTime LastReceived { get; set; } = DateTime.UtcNow;
 }

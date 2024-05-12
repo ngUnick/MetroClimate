@@ -38,7 +38,7 @@ public class ReadingService : IReadingService
     
     public async Task RecordReadingAsync(StationReadingPld reading)
     {
-        var sensor = await _dbContext.Sensors.FindAsync(reading.SensorId);
+        var sensor = await _dbContext.Sensors.Include(s => s.Station).FirstOrDefaultAsync(s => s.Id == reading.SensorId);
         if(sensor == null)
         {
             var sensorType = await _dbContext.SensorTypes.FirstOrDefaultAsync(st => st.SensorTypeEnum == reading.SensorType);
@@ -53,19 +53,23 @@ public class ReadingService : IReadingService
                 Id = reading.SensorId,
                 SensorType = sensorType,
                 Name = reading.SensorName,
-                StationId = (int)reading.StationId
+                StationId = reading.StationId
             };
+            sensor.Station = (await _dbContext.Stations.FirstOrDefaultAsync(s => s.Id == reading.StationId))!;
             _dbContext.Sensors.Add(sensor);
+            await _dbContext.SaveChangesAsync();
         }
         
         var stationReading = new StationReading()
         {
-            StationId = (int)reading.StationId,
+            StationId = reading.StationId,
             SensorId = reading.SensorId,
             Value = reading.Value
         };
         
         _dbContext.StationReadings.Add(stationReading);
+        sensor.Station.LastReceived = DateTime.UtcNow;
+        _dbContext.Stations.Update(sensor.Station);
         await _dbContext.SaveChangesAsync();
     }
     

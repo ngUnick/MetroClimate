@@ -12,7 +12,7 @@ public interface IStationService
 
 public class StationService : IStationService
 {
-    private MetroClimateDbContext _dbContext;
+    private readonly MetroClimateDbContext _dbContext;
     
     public StationService(MetroClimateDbContext dbContext)
     {
