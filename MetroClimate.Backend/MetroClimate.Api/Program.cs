@@ -1,6 +1,9 @@
+using System.Reflection;
+using FluentValidation;
 using MetroClimate.Data.Common;
 using MetroClimate.Data.Constants;
 using MetroClimate.Data.Database;
+using MetroClimate.Data.Extensions;
 using MetroClimate.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +11,8 @@ using MetroClimate.Services.Extensions;
 using MetroClimate.Services.Services;
 using Newtonsoft.Json;
 using StackExchange.Redis;
+using FluentValidation;
+using MetroClimate.Data.Filters;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,10 +32,17 @@ builder.Services.AddDbContext<MetroClimateDbContext>(options =>
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")!));
 
 
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 
 
-builder.Services
-    .AddControllers(options => { options.Filters.Add<ExceptionFilter>(); })
+
+builder.Services.AddControllers(options =>
+    {
+        options.Filters.Add<ExceptionFilter>();
+    })
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.ContractResolver = BaseFirstContractResolver.Instance;
@@ -42,13 +54,8 @@ builder.Services.AddTransient<IWeatherService, WeatherService>();
 builder.Services.AddTransient<IStationService, StationService>();
 builder.Services.AddTransient<DataSeeder>();
 
-builder.Services.AddControllers()
-    .ConfigureApiBehaviorOptions(options =>
-    {
-        // This configuration ensures that a BadRequest is automatically returned on model validation errors
-        options.InvalidModelStateResponseFactory = actionContext =>
-            new BadRequestObjectResult(actionContext.ModelState);
-    });
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+ValidatorOptions.Global.PropertyNameResolver = CamelCasePropertyNameResolver.ResolvePropertyName;
 
 
 var app = builder.Build();
@@ -58,8 +65,6 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseDeveloperExceptionPage();
-
     // Add row to the database
     // using var scope = app.Services.CreateScope();
     // var dbContext = scope.ServiceProvider.GetRequiredService<MetroClimateDbContext>();

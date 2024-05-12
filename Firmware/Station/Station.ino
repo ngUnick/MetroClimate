@@ -6,8 +6,8 @@
 #define DHT_SENSOR_TYPE DHT11
 
 // WiFi credentials
-const char* ssid = "thankarezosP";
-const char* password = "thanasiskaa";
+#include "Credentials.h"
+
 
 DHT dht_sensor(DHT_SENSOR_PIN, DHT_SENSOR_TYPE);
 WiFiClient wifiClient;
@@ -35,9 +35,9 @@ void loop() {
   } else {
     if (WiFi.status() == WL_CONNECTED) {
       HTTPClient http;
-      String postData = "{\"StationId\": 1, \"SensorId\": 1, \"Value\": " + String((double)temperatureC) + "}";
+      String postData = "{\"StationId\": 1, \"SensorId\": 1, \"Value\": " + String((double)temperatureC) + "\"SensorType\": 0}";
 
-      http.begin(wifiClient, "http://192.168.132.106:5205/Station"); // Replace "your-server-ip" with the actual server IP
+      http.begin(wifiClient, "http://" + String(server_ip) + ":" + String(server_port) + "/Station");
       http.addHeader("Content-Type", "application/json");
 
       int httpCode = http.POST(postData);

@@ -3,5 +3,6 @@
 public enum ErrorCode
 {
     InvalidPayload = 400,
-    ServerError = 500
+    ServerError = 500,
+    BadRequest = 400
 }

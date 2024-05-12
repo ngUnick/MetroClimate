@@ -1,7 +1,11 @@
+using System.ComponentModel.DataAnnotations;
+using MetroClimate.Data.Common;
+using MetroClimate.Data.Constants;
 using MetroClimate.Data.Dtos;
 using MetroClimate.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using MetroClimate.Services.Services;
+using MetroClimate.Services.Validator;
 
 namespace MetroClimate.Api.Controllers;
 
@@ -23,15 +27,17 @@ public class StationController : ControllerBase
     }
     
     [HttpPost(Name = "SentStationReading")]
-    public async Task<IActionResult> SentStationReading(StationReadingPld reading)
+    public async Task<ApiResponse> SentStationReading(StationReadingPld reading)
     {
-        if (!ModelState.IsValid)
+        var validator = new StationReadingValidator();
+        var validationResult = await validator.ValidateAsync(reading);
+        if (!validationResult.IsValid)
         {
-            // This manually triggers the custom InvalidModelStateResponseFactory logic.
-            return ValidationProblem(ModelState);
+            return new ApiResponse(ErrorCode.BadRequest, "Invalid data", validationResult);
         }
+
         await _stationService.RecordReadingAsync(reading);
-        return Ok();
+        return new ApiResponse();
     }
     
 }
