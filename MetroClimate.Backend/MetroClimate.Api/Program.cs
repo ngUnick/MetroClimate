@@ -1,5 +1,7 @@
 using System.Reflection;
+using System.Text;
 using FluentValidation;
+using MetroClimate.Data.Configurations;
 using MetroClimate.Data.Database;
 using MetroClimate.Data.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +11,8 @@ using MetroClimate.Services.Services;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using MetroClimate.Data.Filters;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +36,20 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
 });
+
+var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings!.Secret)),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
 
 
 

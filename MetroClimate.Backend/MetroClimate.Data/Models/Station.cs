@@ -12,6 +12,7 @@ public class Station : IRecordable
     [MaxLength(50)]
     public required string Description { get; set; }
     public List<Sensor>? Sensors { get; set; }
+    public User User { get; set; } = null!;
     public DateTime Created { get; set; }
     public DateTime Updated { get; set; }
     public DateTime LastReceived { get; set; } = DateTime.UtcNow;

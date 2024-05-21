@@ -33,5 +33,27 @@ public class StationController : ControllerBase
         return new ApiResponse<IEnumerable<StationDto>?>(await _stationService.GetUserStationsAsync(payload.UserId));
     }
     
+    [HttpPost(Name = "AddStation")] // "userId" is a placeholder for the actual user id
+    public async Task<ApiResponse> Post([FromBody] AddStationPld addStationPld)
+    {
+        var validator = new AddStationValidator();
+        var validationResult = await validator.ValidateAsync(addStationPld);
+        if (!validationResult.IsValid)
+        {
+            return new ApiResponse(ErrorCode.BadRequest, "Invalid data", validationResult);
+        }
+        
+        var station = new Station
+        {
+            Id = addStationPld.Id,
+            Name = addStationPld.Name,
+            Description = addStationPld.Description,
+            UserId = 1
+        };
+        
+        await _stationService.AddStationAsync(station);
+        return new ApiResponse();
+    }
+    
     
 }
