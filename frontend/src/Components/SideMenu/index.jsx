@@ -1,12 +1,16 @@
-import { AppstoreOutlined, ShopOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
+import { AppstoreOutlined, SettingOutlined } from "@ant-design/icons";
 import { Menu } from "antd";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faSatelliteDish,
+} from "@fortawesome/free-solid-svg-icons";
 
 function SideMenu() {
   const navigate = useNavigate()
   return (
     <div className="side-menu">
-      <Menu
+      <Menu style={{fontSize: "18px", marginTop: "10px", marginLeft: "5px"}}
         onClick={(item) => {
           navigate(item.key);
         }}
@@ -14,22 +18,17 @@ function SideMenu() {
           {
             label: "Dashboard",
             key: "/",
-            icon:<AppstoreOutlined />,
+            icon:<AppstoreOutlined style={{fontSize: "18px"}}/>,
           },
           {
-            label: "Inventory",
-            key: "/inventory",
-            icon:<ShopOutlined />,
+            label: "Stations",
+            key: "/stations",
+            icon:<FontAwesomeIcon icon={faSatelliteDish} style={{fontSize: "18px"}}/>,
           },
           {
-            label: "Orders",
-            key: "/orders",
-            icon:<ShoppingCartOutlined />,
-          },
-          {
-            label: "Customers",
-            key: "/customers",
-            icon:<UserOutlined />,
+            label: "Settings",
+            key: "/settings",
+            icon:<SettingOutlined style={{fontSize: "18px"}}/>,
           },
         ]}
       ></Menu>
