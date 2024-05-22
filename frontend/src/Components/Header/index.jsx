@@ -11,7 +11,7 @@ function Header() {
         src={logo}
         preview={false}
       ></Image>
-      <Typography.Title>Welcome {name}!</Typography.Title>
+      <Typography.Title style={{textTransform: "capitalize"}}>Welcome {name}!</Typography.Title>
       <Space>
         <Badge dot color="green" size="large" offset={[-34, 6]}>
           <Avatar size={34} icon={<UserOutlined />} src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" style={{border: "1px green solid", padding: "", width: "40px", height: "40px"}}/>
