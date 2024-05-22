@@ -1,11 +1,7 @@
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Hosting;
-using System;
-using Microsoft.Extensions.Logging;
 
-namespace MetroClimate.Data.Filters;
+namespace MetroClimate.Api.Filters;
 
 public class ExceptionFilter : IExceptionFilter
 {

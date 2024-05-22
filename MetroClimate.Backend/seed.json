@@ -11,13 +11,13 @@
   "Station": 
     [
       {
-        "Id": "abcd567890-1",
+        "Id": "abcd567890",
         "UserId": 1,
         "Name": "Station 1",
         "Description": "Station 1 Description"
       },
       {
-        "Id": "abcd567891-1",
+        "Id": "abcd567891",
         "UserId": 1,
         "Name": "Station 2",
         "Description": "Station 2 Description"

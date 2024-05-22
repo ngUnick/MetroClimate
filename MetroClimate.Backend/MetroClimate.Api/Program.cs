@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text;
 using FluentValidation;
+using MetroClimate.Api.Filters;
 using MetroClimate.Data.Configurations;
 using MetroClimate.Data.Database;
 using MetroClimate.Data.Extensions;
@@ -10,7 +11,6 @@ using MetroClimate.Services.Extensions;
 using MetroClimate.Services.Services;
 using Newtonsoft.Json;
 using StackExchange.Redis;
-using MetroClimate.Data.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 

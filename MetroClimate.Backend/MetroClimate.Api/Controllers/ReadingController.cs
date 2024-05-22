@@ -1,5 +1,6 @@
 using FluentValidation;
 using FluentValidation.Results;
+using MetroClimate.Api.Filters;
 using MetroClimate.Data.Common;
 using MetroClimate.Data.Constants;
 using MetroClimate.Data.Database;
@@ -26,19 +27,14 @@ public class ReadingController : ControllerBase
         _readingService = readingService;
     }
 
-
+    [Authorization]
     [HttpGet(Name = "GetSensorReadings")] // "sensorId" is a placeholder for the actual sensor id
     public async Task<ApiResponse<IEnumerable<FullStationReadingDto>?>> Get([FromQuery] GetSensorReadingsPld payload)
     {
-        var (user, validationResult) = await TokenValidator.ValidateToken(_userService, Request.Headers);
-        
-        if (!validationResult.IsValid)
-        {
-            return new ApiResponse<IEnumerable<FullStationReadingDto>?>(ErrorCode.Unauthorized, "Unauthorized", validationResult);
-        }
+        var user = HttpContext.Items["User"] as User;
         
         var validator = new GetSensorReadingsValidator(_dbContext);
-        validationResult = await validator.ValidateAsync(payload);
+        var validationResult = await validator.ValidateAsync(payload);
         
         if (!validationResult.IsValid)
         {

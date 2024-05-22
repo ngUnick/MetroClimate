@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using FluentValidation.Results;
+using MetroClimate.Api.Filters;
 using MetroClimate.Data.Common;
 using MetroClimate.Data.Constants;
 using MetroClimate.Data.Database;
@@ -29,45 +30,25 @@ public class StationController : ControllerBase
         _dbContext = dbContext;
     }
 
+    [Authorization]
     [HttpGet(Name = "GetUserStations")] // "userId" is a placeholder for the actual user id
     public async Task<ApiResponse<IEnumerable<StationDto>?>> Get()
     {
-        var validationResult = new ValidationResult();
-        
-        var user = await _userService.GetUserFromToken(Request.Headers.Authorization!);
-        
-        if (user == null)
-        {
-            validationResult.Errors.Add(new ValidationFailure("Authorization", "Invalid token"));
-            return new ApiResponse<IEnumerable<StationDto>?>(ErrorCode.Unauthorized, "Invalid data", validationResult);
-        }
-        
-        if (Request.Headers.Authorization.Count == 0)
-        {
-            validationResult.Errors.Add(new ValidationFailure("Authorization", "Authorization header is missing"));
-            return new ApiResponse<IEnumerable<StationDto>?>(ErrorCode.Unauthorized, "Invalid data", validationResult);
-        }
-        
+        var user = HttpContext.Items["User"] as User;
         
         return new ApiResponse<IEnumerable<StationDto>?>(await _stationService.GetUserStationsAsync(user.Id));
         
         
     }
     
+    [Authorization]
     [HttpPost(Name = "AddStation")] // "userId" is a placeholder for the actual user id
     public async Task<ApiResponse> Post([FromBody] AddStationPld addStationPld)
     {
-        var validationResult = new ValidationResult();
-        var user = await _userService.GetUserFromToken(Request.Headers.Authorization!);
+        var user = HttpContext.Items["User"] as User;
         
-        if (user == null)
-        {
-            validationResult.Errors.Add(new ValidationFailure("Authorization", "Invalid token"));
-            return new ApiResponse(ErrorCode.Unauthorized, "Invalid data", validationResult);
-        }
-        
-        var validator = new AddStationValidator(user, _dbContext);
-        validationResult = await validator.ValidateAsync(addStationPld);
+        var validator = new AddStationValidator(user!, _dbContext);
+        var validationResult = await validator.ValidateAsync(addStationPld);
         
         if (Request.Headers.Authorization.Count == 0)
         {
@@ -83,10 +64,10 @@ public class StationController : ControllerBase
         
         var station = new Station
         {
-            Id = addStationPld.Id + "-" + user.Id,
+            Id = addStationPld.Id,
             Name = addStationPld.Name,
             Description = addStationPld.Description,
-            UserId = user.Id
+            UserId = user!.Id
         };
         
         await _stationService.AddStationAsync(station);

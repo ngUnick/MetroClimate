@@ -19,8 +19,7 @@ public class AddStationValidator : AbstractValidator<AddStationPld>
             .Length(10)
             .MustAsync(async (id, cancellationToken) =>
             {
-                var stationId = id + "-" + user.Id;
-                return !await dbContext!.Stations.AnyAsync(s => s.Id == stationId, cancellationToken);
+                return !await dbContext!.Stations.AnyAsync(s => s.Id == id && s.UserId == user.Id);
             })
             .WithMessage("Station with this id already exists");
             
