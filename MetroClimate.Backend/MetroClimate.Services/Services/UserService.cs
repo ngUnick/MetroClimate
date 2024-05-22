@@ -1,4 +1,5 @@
 using MetroClimate.Data.Database;
+using MetroClimate.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace MetroClimate.Services.Services;
@@ -6,6 +7,7 @@ namespace MetroClimate.Services.Services;
 public interface IUserService
 {
     Task<string?> Login(string username, string password);
+    Task<User?> GetUserFromToken(string token);
     
 }
 
@@ -32,6 +34,18 @@ public class UserService : IUserService
         
         return await _jwtService.GenerateJwtToken(user.Id);
         
+    }
+    
+    public async Task<User?> GetUserFromToken(string token)
+    {
+        var userId = await _jwtService.GetUserIdFromToken(token);
+        
+        if (userId == null)
+        {
+            return null;
+        }
+        
+        return await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == userId);
     }
     
 }

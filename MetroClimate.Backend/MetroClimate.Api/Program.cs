@@ -37,7 +37,9 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.SuppressModelStateInvalidFilter = true;
 });
 
-var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
+// Add JWT authentication settings to IMonitoringSettings
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -45,7 +47,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings!.Secret)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetSection("Jwt")["Secret"] ?? throw new InvalidOperationException())),
             ValidateIssuer = false,
             ValidateAudience = false
         };
@@ -67,6 +69,8 @@ builder.Services.AddControllers(options =>
 builder.Services.AddTransient<IWeatherService, WeatherService>();
 builder.Services.AddTransient<IStationService, StationService>();
 builder.Services.AddTransient<IReadingService, ReadingService>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IJwtService, JwtService>();
 builder.Services.AddTransient<DataSeeder>();
 
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

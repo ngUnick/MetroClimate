@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MetroClimate.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial4 : Migration
+    public partial class Initial1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,6 +22,8 @@ namespace MetroClimate.Data.Migrations
                     description = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     unit = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
                     symbol = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    sensor_type_enum = table.Column<int>(type: "integer", nullable: false),
+                    formula = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     min_value = table.Column<int>(type: "integer", nullable: false),
                     max_value = table.Column<int>(type: "integer", nullable: false)
                 },
@@ -31,20 +33,20 @@ namespace MetroClimate.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "stations",
+                name: "users",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    user_id = table.Column<int>(type: "integer", nullable: false),
-                    name = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    description = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    username = table.Column<string>(type: "text", nullable: false),
+                    password = table.Column<string>(type: "text", nullable: false),
+                    email = table.Column<string>(type: "text", nullable: false),
                     created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_stations", x => x.id);
+                    table.PrimaryKey("pk_users", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -64,15 +66,38 @@ namespace MetroClimate.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "stations",
+                columns: table => new
+                {
+                    id = table.Column<string>(type: "text", nullable: false),
+                    user_id = table.Column<int>(type: "integer", nullable: false),
+                    name = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    description = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    last_received = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_stations", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_stations_users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "sensors",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    station_id = table.Column<int>(type: "integer", nullable: false),
-                    name = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    description = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    type_id = table.Column<int>(type: "integer", nullable: true),
+                    station_id = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    sensor_type_id = table.Column<int>(type: "integer", nullable: false),
+                    name = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: true),
+                    description = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true),
                     created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -80,10 +105,11 @@ namespace MetroClimate.Data.Migrations
                 {
                     table.PrimaryKey("pk_sensors", x => x.id);
                     table.ForeignKey(
-                        name: "fk_sensors_sensor_types_type_id",
-                        column: x => x.type_id,
+                        name: "fk_sensors_sensor_types_sensor_type_id",
+                        column: x => x.sensor_type_id,
                         principalTable: "sensor_types",
-                        principalColumn: "id");
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "fk_sensors_stations_station_id",
                         column: x => x.station_id,
@@ -98,15 +124,21 @@ namespace MetroClimate.Data.Migrations
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    station_id = table.Column<int>(type: "integer", nullable: false),
+                    station_id = table.Column<string>(type: "text", nullable: false),
                     sensor_id = table.Column<int>(type: "integer", nullable: false),
-                    value = table.Column<int>(type: "integer", nullable: false),
+                    value = table.Column<double>(type: "double precision", nullable: false),
                     created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_station_readings", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_station_readings_sensors_sensor_id",
+                        column: x => x.sensor_id,
+                        principalTable: "sensors",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "fk_station_readings_stations_station_id",
                         column: x => x.station_id,
@@ -116,27 +148,40 @@ namespace MetroClimate.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "ix_sensors_sensor_type_id",
+                table: "sensors",
+                column: "sensor_type_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_sensors_station_id",
                 table: "sensors",
                 column: "station_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_sensors_type_id",
-                table: "sensors",
-                column: "type_id");
+                name: "ix_station_readings_sensor_id",
+                table: "station_readings",
+                column: "sensor_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_station_readings_station_id",
                 table: "station_readings",
                 column: "station_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_stations_user_id",
+                table: "stations",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_username",
+                table: "users",
+                column: "username",
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "sensors");
-
             migrationBuilder.DropTable(
                 name: "station_readings");
 
@@ -144,10 +189,16 @@ namespace MetroClimate.Data.Migrations
                 name: "weather_forecasts");
 
             migrationBuilder.DropTable(
+                name: "sensors");
+
+            migrationBuilder.DropTable(
                 name: "sensor_types");
 
             migrationBuilder.DropTable(
                 name: "stations");
+
+            migrationBuilder.DropTable(
+                name: "users");
         }
     }
 }

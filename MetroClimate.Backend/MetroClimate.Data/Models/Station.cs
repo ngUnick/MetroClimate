@@ -5,7 +5,7 @@ namespace MetroClimate.Data.Models;
 
 public class Station : IRecordable
 {
-    public int Id { get; set; }
+    public required string Id { get; set; }
     public int UserId { get; set; }
     [MaxLength(10)]
     public required string Name { get; set; }

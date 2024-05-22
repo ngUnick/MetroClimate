@@ -6,7 +6,7 @@ namespace MetroClimate.Data.Models;
 public class StationReading : IRecordable
 {
     public int Id { get; set; }
-    public int StationId { get; set; }
+    public required string StationId { get; set; }
     public int SensorId { get; set; }
     public double Value { get; set; }
     public Station Station{ get; set; } = null!;

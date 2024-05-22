@@ -12,6 +12,7 @@ namespace MetroClimate.Services.Services;
 public interface IJwtService
 {
     Task<string?> GenerateJwtToken(int userId);
+    Task<int?> GetUserIdFromToken(string token);
     
 }
 
@@ -37,6 +38,30 @@ public class JwtService : IJwtService
         };
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return await Task.FromResult(tokenHandler.WriteToken(token));
+    }
+    
+    public async Task<int?> GetUserIdFromToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(_jwtSettings.CurrentValue.Secret);
+        try
+        {
+            tokenHandler.ValidateToken(token, new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
+            }, out var validatedToken);
+            var jwtToken = (JwtSecurityToken) validatedToken;
+            var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
+            return await Task.FromResult(userId);
+        }
+        catch
+        {
+            return await Task.FromResult((int?) null);
+        }
     }
     
 }

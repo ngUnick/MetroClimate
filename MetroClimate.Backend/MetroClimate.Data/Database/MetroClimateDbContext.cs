@@ -57,7 +57,9 @@ public class MetroClimateDbContext : DbContext
             .HasForeignKey(s => s.StationId)
             .OnDelete(DeleteBehavior.Cascade);
         
-        
+        modelBuilder.Entity<Station>()
+            .HasKey(s => s.Id);
+
         modelBuilder.Entity<Station>()
             .HasOne(s => s.User)
             .WithMany(u => u.Stations)

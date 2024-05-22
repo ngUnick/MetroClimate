@@ -19,7 +19,7 @@ public class UserController : ControllerBase
         _userService = userService;
     }
     
-    [HttpPost(Name = "Login")]
+    [HttpPost("login")]
     public async Task<ApiResponse<string?>> Login([FromBody] LoginPld loginPld)
     {
         var validator = new LoginValidator();

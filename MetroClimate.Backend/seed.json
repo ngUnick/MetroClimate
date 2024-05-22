@@ -1,14 +1,23 @@
 {
-  "Station": 
+  "User": 
     [
       {
         "Id": 1,
+        "Username": "thankarezos",
+        "Password": "123456",
+        "Email": "thankarezos@gmail.com"
+      }
+    ],
+  "Station": 
+    [
+      {
+        "Id": "abcd567890-1",
         "UserId": 1,
         "Name": "Station 1",
         "Description": "Station 1 Description"
       },
       {
-        "Id": 2,
+        "Id": "abcd567891-1",
         "UserId": 1,
         "Name": "Station 2",
         "Description": "Station 2 Description"

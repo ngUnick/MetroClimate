@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using FluentValidation.Results;
 using MetroClimate.Data.Common;
 using MetroClimate.Data.Constants;
 using MetroClimate.Data.Dtos;
@@ -15,10 +16,12 @@ namespace MetroClimate.Api.Controllers;
 public class StationController : ControllerBase
 {
     private readonly IStationService _stationService;
+    private readonly IUserService _userService;
 
-    public StationController(ILogger<WeatherForecastController> logger, IStationService stationService)
+    public StationController(ILogger<WeatherForecastController> logger, IStationService stationService, IUserService userService)
     {
         _stationService = stationService;
+        _userService = userService;
     }
 
     [HttpGet(Name = "GetUserStations")] // "userId" is a placeholder for the actual user id
@@ -38,17 +41,43 @@ public class StationController : ControllerBase
     {
         var validator = new AddStationValidator();
         var validationResult = await validator.ValidateAsync(addStationPld);
+        
+        if (Request.Headers.Authorization.Count == 0)
+        {
+            validationResult.Errors.Add(new ValidationFailure("Authorization", "Authorization header is missing"));
+            return new ApiResponse(ErrorCode.Unauthorized, "Invalid data", validationResult);
+        }
+        
+        var user = await _userService.GetUserFromToken(Request.Headers.Authorization!);
+        
+        if (user == null)
+        {
+            validationResult.Errors.Add(new ValidationFailure("Authorization", "Invalid token"));
+            return new ApiResponse(ErrorCode.Unauthorized, "Invalid data", validationResult);
+        }
+        
+        var stationId = addStationPld.Id + "-" + user.Id;
+        
+        var stationExists = await _stationService.StationExists(stationId);
+        
+        if (stationExists)
+        {
+            validationResult.Errors.Add(new ValidationFailure("Id", "Station with this id already exists"));
+            return new ApiResponse(ErrorCode.BadRequest, "Invalid data", validationResult);
+        }
+        
         if (!validationResult.IsValid)
         {
             return new ApiResponse(ErrorCode.BadRequest, "Invalid data", validationResult);
         }
         
+        
         var station = new Station
         {
-            Id = addStationPld.Id,
+            Id = stationId,
             Name = addStationPld.Name,
             Description = addStationPld.Description,
-            UserId = 1
+            UserId = user.Id
         };
         
         await _stationService.AddStationAsync(station);

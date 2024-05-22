@@ -7,7 +7,8 @@ namespace MetroClimate.Data.Models;
 public class Sensor : IRecordable
 {
     public int Id { get; set; }
-    public int StationId { get; set; }
+    [MaxLength(10)]
+    public required string StationId { get; set; }
     public int SensorTypeId { get; set; }
     [MaxLength(15)]
     public string? Name { get; set; }

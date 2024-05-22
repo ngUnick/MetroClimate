@@ -1,4 +1,5 @@
 using FluentValidation;
+using MetroClimate.Data.Database;
 using MetroClimate.Data.Dtos.Payload;
 
 namespace MetroClimate.Services.Validator;
@@ -11,7 +12,8 @@ public class AddStationValidator : AbstractValidator<AddStationPld>
         RuleFor(x => x.Id)
             .NotNull()
             .NotEmpty()
-            .GreaterThan(0);
+            .Length(10);
+            
         RuleFor(x => x.Name)
             .NotNull()
             .NotEmpty()
