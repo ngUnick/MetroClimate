@@ -1,4 +1,5 @@
-using System.ComponentModel.DataAnnotations;
+using FluentValidation;
+using FluentValidation.Results;
 using MetroClimate.Data.Common;
 using MetroClimate.Data.Constants;
 using MetroClimate.Data.Database;
@@ -17,6 +18,7 @@ public class ReadingController : ControllerBase
 {
     private readonly IReadingService _readingService;
     private readonly MetroClimateDbContext _dbContext;
+    private readonly IUserService _userService;
 
     public ReadingController(ILogger<WeatherForecastController> logger, IReadingService readingService, MetroClimateDbContext dbContext)
     {
@@ -26,9 +28,24 @@ public class ReadingController : ControllerBase
 
 
     [HttpGet(Name = "GetSensorReadings")] // "sensorId" is a placeholder for the actual sensor id
-    public async Task<ApiResponse<IEnumerable<FullStationReadingDto>?>> Get(int userId, int sensorId)
+    public async Task<ApiResponse<IEnumerable<FullStationReadingDto>?>> Get([FromQuery] GetSensorReadingsPld payload)
     {
-        return new ApiResponse<IEnumerable<FullStationReadingDto>?>(await _readingService.GetReadingsAsync(userId, sensorId));
+        var (user, validationResult) = await TokenValidator.ValidateToken(_userService, Request.Headers);
+        
+        if (!validationResult.IsValid)
+        {
+            return new ApiResponse<IEnumerable<FullStationReadingDto>?>(ErrorCode.Unauthorized, "Unauthorized", validationResult);
+        }
+        
+        var validator = new GetSensorReadingsValidator(_dbContext);
+        validationResult = await validator.ValidateAsync(payload);
+        
+        if (!validationResult.IsValid)
+        {
+            return new ApiResponse<IEnumerable<FullStationReadingDto>?>(ErrorCode.BadRequest, "Invalid data", validationResult);
+        }
+
+        return new ApiResponse<IEnumerable<FullStationReadingDto>?>(await _readingService.GetReadingsAsync(user!.Id, payload.SensorId));
     }
     
     [HttpPost(Name = "SentStationReading")]

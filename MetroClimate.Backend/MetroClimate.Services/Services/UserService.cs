@@ -1,4 +1,5 @@
 using MetroClimate.Data.Database;
+using MetroClimate.Data.Dtos.Payload;
 using MetroClimate.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,8 +7,9 @@ namespace MetroClimate.Services.Services;
 
 public interface IUserService
 {
-    Task<string?> Login(string username, string password);
+    Task<(string? token, User? user)> Login(string username, string password);
     Task<User?> GetUserFromToken(string token);
+    Task<(string? token, User? user)> Register(RegisterPld registerPld);
     
 }
 
@@ -22,19 +24,39 @@ public class UserService : IUserService
         _dbContext = dbContext; 
     }
     
-    public async Task<string?> Login(string username, string password)
+    public async Task<(string? token, User? user)> Login(string username, string password)
     {
         //check if user exists
         var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Username == username && x.Password == password);
         
         if (user == null)
         {
-            return null;
+            return (null, null);
         }
         
-        return await _jwtService.GenerateJwtToken(user.Id);
+        var token = await _jwtService.GenerateJwtToken(user.Id);
+        
+        return (token, user);
         
     }
+    
+    public async Task<(string? token, User? user)> Register(RegisterPld registerPld)
+    {
+        var user = new User
+        {
+            Username = registerPld.Username,
+            Password = registerPld.Password,
+            Email = registerPld.Email
+        };
+        
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.SaveChangesAsync();
+        
+        var token = await _jwtService.GenerateJwtToken(user.Id);
+        
+        return (token, user);
+    }
+    
     
     public async Task<User?> GetUserFromToken(string token)
     {
