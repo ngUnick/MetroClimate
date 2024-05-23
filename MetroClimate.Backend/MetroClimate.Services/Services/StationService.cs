@@ -8,6 +8,8 @@ namespace MetroClimate.Services.Services;
 public interface IStationService
 {
     Task <List<StationDto>?> GetUserStationsAsync(int id);
+    Task AddStationAsync(Station station);
+    Task <bool> StationExists(string id);
 }
 
 public class StationService : IStationService
@@ -34,5 +36,16 @@ public class StationService : IStationService
         
         return stationDtos;
         
+    }
+    
+    public async Task AddStationAsync(Station station)
+    {
+        await _dbContext.Stations.AddAsync(station);
+        await _dbContext.SaveChangesAsync();
+    }
+    
+    public async Task<bool> StationExists(string id)
+    {
+        return await _dbContext.Stations.AnyAsync(s => s.Id == id);
     }
 }

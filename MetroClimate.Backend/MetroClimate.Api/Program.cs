@@ -1,5 +1,8 @@
 using System.Reflection;
+using System.Text;
 using FluentValidation;
+using MetroClimate.Api.Filters;
+using MetroClimate.Data.Configurations;
 using MetroClimate.Data.Database;
 using MetroClimate.Data.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +11,8 @@ using MetroClimate.Services.Extensions;
 using MetroClimate.Services.Services;
 using Newtonsoft.Json;
 using StackExchange.Redis;
-using MetroClimate.Data.Filters;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +37,22 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.SuppressModelStateInvalidFilter = true;
 });
 
+// Add JWT authentication settings to IMonitoringSettings
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetSection("Jwt")["Secret"] ?? throw new InvalidOperationException())),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
+
 
 
 builder.Services.AddControllers(options =>
@@ -49,6 +69,8 @@ builder.Services.AddControllers(options =>
 builder.Services.AddTransient<IWeatherService, WeatherService>();
 builder.Services.AddTransient<IStationService, StationService>();
 builder.Services.AddTransient<IReadingService, ReadingService>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IJwtService, JwtService>();
 builder.Services.AddTransient<DataSeeder>();
 
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

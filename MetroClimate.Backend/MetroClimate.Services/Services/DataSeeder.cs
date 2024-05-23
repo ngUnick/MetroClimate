@@ -37,6 +37,7 @@ public class DataSeeder
         
         await SeedMany<SensorType>(seedObject, "SensorType");
         await SeedMany<Station>(seedObject, "Station");
+        await SeedMany<User>(seedObject, "User");
         // await SeedMany<Sensor>(seedObject, "Sensor");
         await _dbContext.SaveChangesAsync();
     }

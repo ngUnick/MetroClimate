@@ -49,8 +49,10 @@ namespace MetroClimate.Data.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("sensor_type_id");
 
-                    b.Property<int>("StationId")
-                        .HasColumnType("integer")
+                    b.Property<string>("StationId")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
                         .HasColumnName("station_id");
 
                     b.Property<DateTime>("Updated")
@@ -127,12 +129,9 @@ namespace MetroClimate.Data.Migrations
 
             modelBuilder.Entity("MetroClimate.Data.Models.Station", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                    b.Property<string>("Id")
+                        .HasColumnType("text")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone")
@@ -165,6 +164,9 @@ namespace MetroClimate.Data.Migrations
                     b.HasKey("Id")
                         .HasName("pk_stations");
 
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_stations_user_id");
+
                     b.ToTable("stations", (string)null);
                 });
 
@@ -185,8 +187,9 @@ namespace MetroClimate.Data.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("sensor_id");
 
-                    b.Property<int>("StationId")
-                        .HasColumnType("integer")
+                    b.Property<string>("StationId")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("station_id");
 
                     b.Property<DateTime>("Updated")
@@ -207,6 +210,48 @@ namespace MetroClimate.Data.Migrations
                         .HasDatabaseName("ix_station_readings_station_id");
 
                     b.ToTable("station_readings", (string)null);
+                });
+
+            modelBuilder.Entity("MetroClimate.Data.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("email");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("password");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("username");
+
+                    b.HasKey("Id")
+                        .HasName("pk_users");
+
+                    b.HasIndex("Username")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_username");
+
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("MetroClimate.Data.Models.WeatherForecast", b =>
@@ -262,6 +307,18 @@ namespace MetroClimate.Data.Migrations
                     b.Navigation("Station");
                 });
 
+            modelBuilder.Entity("MetroClimate.Data.Models.Station", b =>
+                {
+                    b.HasOne("MetroClimate.Data.Models.User", "User")
+                        .WithMany("Stations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_stations_users_user_id");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("MetroClimate.Data.Models.StationReading", b =>
                 {
                     b.HasOne("MetroClimate.Data.Models.Sensor", "Sensor")
@@ -291,6 +348,11 @@ namespace MetroClimate.Data.Migrations
             modelBuilder.Entity("MetroClimate.Data.Models.Station", b =>
                 {
                     b.Navigation("Sensors");
+                });
+
+            modelBuilder.Entity("MetroClimate.Data.Models.User", b =>
+                {
+                    b.Navigation("Stations");
                 });
 #pragma warning restore 612, 618
         }

@@ -48,14 +48,14 @@ public class ReadingService : IReadingService
             }
             
             
-            sensor = new Sensor()
+            sensor = new Sensor
             {
                 Id = reading.SensorId,
                 SensorType = sensorType,
                 Name = reading.SensorName,
-                StationId = reading.StationId
+                StationId = reading.StationId,
+                Station = (await _dbContext.Stations.FirstOrDefaultAsync(s => s.Id == reading.StationId))!
             };
-            sensor.Station = (await _dbContext.Stations.FirstOrDefaultAsync(s => s.Id == reading.StationId))!;
             _dbContext.Sensors.Add(sensor);
         }
         

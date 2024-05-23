@@ -25,7 +25,7 @@ public class MetroClimateDbContext : DbContext
     public DbSet<Sensor> Sensors { get; set; }
     public DbSet<SensorType> SensorTypes { get; set; }
     public DbSet<StationReading> StationReadings { get; set; }
-    
+    public DbSet<User> Users { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,8 +56,19 @@ public class MetroClimateDbContext : DbContext
             .WithOne(s => s.Station)
             .HasForeignKey(s => s.StationId)
             .OnDelete(DeleteBehavior.Cascade);
-            
-            
+        
+        modelBuilder.Entity<Station>()
+            .HasKey(s => s.Id);
+
+        modelBuilder.Entity<Station>()
+            .HasOne(s => s.User)
+            .WithMany(u => u.Stations)
+            .HasForeignKey(s => s.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Username)
+            .IsUnique();
             
             
             

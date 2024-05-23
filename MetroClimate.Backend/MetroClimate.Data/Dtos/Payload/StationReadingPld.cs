@@ -6,7 +6,7 @@ namespace MetroClimate.Data.Dtos.Payload;
 public class StationReadingPld
 {
     [Required]
-    public required int StationId { get; set; }
+    public required string StationId { get; set; }
     [Required]
     public required int SensorId { get; set; }
     [Required]

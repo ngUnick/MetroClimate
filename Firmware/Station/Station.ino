@@ -8,6 +8,8 @@
 // WiFi credentials
 #include "Credentials.h"
 
+const char* stationId = "abcd567892";
+
 
 DHT dht_sensor(DHT_SENSOR_PIN, DHT_SENSOR_TYPE);
 WiFiClient wifiClient;
@@ -35,7 +37,7 @@ void loop() {
   } else {
     if (WiFi.status() == WL_CONNECTED) {
       HTTPClient http;
-      String postData = "{\"StationId\": 1, \"SensorId\": 1, \"Value\": " + String((double)temperatureC) + ",\"SensorType\": 0, \"SensorName\": \"Temperature\"}";
+      String postData = "{\"StationId\": \"" + String(stationId) + "\", \"SensorId\": 1, \"Value\": " + String((double)temperatureC) + ", \"SensorType\": 0, \"SensorName\": \"Temperature\"}";
 
       http.begin(wifiClient, "http://" + String(server_ip) + ":" + String(server_port) + "/Reading");
       http.addHeader("Content-Type", "application/json");
