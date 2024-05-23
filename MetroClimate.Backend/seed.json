@@ -46,6 +46,17 @@
           "MinValue": -58,
           "MaxValue": 122,
           "Formula": "x * 9 / 5 + 32"
+      },
+      {
+          "Id": 3,
+          "Name": "Humidity",
+          "Description": "Humidity Sensor",
+          "Unit": "%",
+          "SensorTypeEnum": 1,
+          "Symbol": "%",
+          "MinValue": 0,
+          "MaxValue": 100,
+          "Formula": null
       }
     ]
 }
