@@ -19,7 +19,6 @@ public class ReadingController : ControllerBase
 {
     private readonly IReadingService _readingService;
     private readonly MetroClimateDbContext _dbContext;
-    private readonly IUserService _userService;
 
     public ReadingController(ILogger<WeatherForecastController> logger, IReadingService readingService, MetroClimateDbContext dbContext)
     {
