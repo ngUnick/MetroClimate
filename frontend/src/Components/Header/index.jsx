@@ -1,21 +1,20 @@
-import { Badge, Image, Space, Typography } from "antd";
-import { MailOutlined, BellFilled } from "@ant-design/icons";
+import { Badge, Image, Space, Typography, Avatar } from "antd";
+import { UserOutlined, BellFilled } from "@ant-design/icons";
+import logo from "../../assets/original_logo.png"
 
 function Header() {
+  const name = "Nick";
   return (
     <div className="header">
       <Image
-        width={40}
-        src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/2300px-React-icon.svg.png"
+        width={130}
+        src={logo}
+        preview={false}
       ></Image>
-      <Typography.Title>Dashboard</Typography.Title>
+      <Typography.Title style={{textTransform: "capitalize"}}>Welcome {name}!</Typography.Title>
       <Space>
-        <Badge count={10} dot>
-          <MailOutlined style={{ fontSize: 24 }} />
-        </Badge>
-
-        <Badge count={20}>
-          <BellFilled style={{ fontSize: 24 }} />
+        <Badge dot color="green" size="large" offset={[-34, 6]}>
+          <Avatar size={34} icon={<UserOutlined />} src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" style={{border: "1px green solid", padding: "", width: "40px", height: "40px"}}/>
         </Badge>
       </Space>
     </div>

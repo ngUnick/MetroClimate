@@ -10,7 +10,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 20px 4px 12px;
+  padding: 10px 20px 12px 12px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.15);
 }
 
@@ -30,8 +30,23 @@
 }
 
 .side-menu {
+  width: 180px;
 }
 
 .page-content {
   padding-left: 12px;
+}
+
+
+.station-title {
+  font-size: 40px;
+  font-weight: 600;
+}
+
+.station-info {
+  font-size: 20px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
 }
