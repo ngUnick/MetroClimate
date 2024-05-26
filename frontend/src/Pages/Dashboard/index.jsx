@@ -16,6 +16,7 @@ function Dashboard() {
 
   const [sensorName, setSensorName] = useState(null);
   const [config, setConfig] = useState({});
+  const [sensorId, setSensorId] = useState(null);
 
   // const dataO = [
   //   { time: '1991', value: 3 },
@@ -29,9 +30,19 @@ function Dashboard() {
   //   { time: '1999', value: 13 },
   // ];
 
+  const groupByOptions = {
+    none: null,
+    minute: 1,
+    halfhour: 30,
+    hour: 60,
+    twohour: 120,
+    fourhour: 240,
+  }
+
 
   const showModal = (name, id) => () => {
     setSensorName(name);
+    setSensorId(id);
     setOpen(true);
    
     fetchSensorData(id).then((data) => {
@@ -65,6 +76,35 @@ function Dashboard() {
     setOpen(false);
   };
 
+  const onGroupByChange = (e) => {
+    
+    const minutes = groupByOptions[e.target.value];
+
+    fetchSensorData(sensorId, minutes).then((data) => {
+      //group data by hour and get average value and add time to it
+      const processedData = processSensorData(data);
+      const processedDataConfig  = {
+        data: processedData,
+        height: 400,
+        xField: 'time',
+        yField: 'value',
+        xAxis: {
+          type: 'time',
+          title: {
+            text: 'Time',
+          },
+          label: {
+            rotate: 0, // Rotate labels to be horizontal
+            formatter: (v) => DateTime.fromMillis(v).toFormat('HH:mm'),
+          },
+        },
+      };
+      setConfig(processedDataConfig);
+    
+        
+    }
+  )};
+
   const fetchStations = async () => {
     const response = await apiService.get("/Station");
     setStations(response.data.data);
@@ -81,8 +121,8 @@ function Dashboard() {
     return () => clearInterval(intervalId);
   }, []);
 
-  const fetchSensorData = async (sensorId) => {
-    const response = await apiService.get("/Reading", {sensorId});
+  const fetchSensorData = async (sensorId, groupByMinutes) => {
+    const response = await apiService.get("/Reading", {sensorId, groupByMinutes});
     return response.data.data;
   }
 
@@ -90,7 +130,9 @@ function Dashboard() {
     const timezone = 'Europe/Athens';
     return data.map((item) => {
       const time = DateTime.fromISO(item.created).setZone(timezone).toFormat('HH:mm');
-      return { time: time, value: item.value};
+      //round value to 2 decimal places
+      item.value = Math.round(item.value * 100) / 100;
+      return { time: time, value: item.value };
     });
   };
 
@@ -146,7 +188,23 @@ function Dashboard() {
         okText={"Done"}
         width={"fit-content"}
       >
+        {//add dropdown here to select group by
+        }
+        <Typography.Title level={3} style={{marginRight: "10px"}}>Group By:</Typography.Title>
+        <select onChange={onGroupByChange}>
+            <option value="none">None</option>
+            <option value="minute">Minute</option>
+            <option value="halfhour">Half Hour</option>
+            <option value="hour">Hour</option>
+            <option value="twohour">Two Hours</option>
+            <option value="fourhour">Four Hours</option>
+            {/* <option value="day">Day</option>
+            <option value="week">Week</option>
+            <option value="month">Month</option> */}
+        </select>
         <div style={{ display: "flex", flexDirection: "row", margin: "40px 20px 10px"}}>
+          
+
           <Graph graphconfig={config}/>
         </div>
       </Modal>

@@ -20,51 +20,124 @@ public class ReadingService : IReadingService
     {
         _dbContext = dbContext;
     }
-
-
-    public async Task<List<FullStationReadingDto>?> GetReadingsAsync(int userId, int sensorId, int? minutes = null , int? groupByMinutes = null)
+    public async Task<List<FullStationReadingDto>?> GetReadingsAsync(int userId, int sensorId, int? minutes = null, int? groupByMinutes = null)
     {
-        var oneDayAgo = DateTime.UtcNow.AddMinutes(-minutes ?? -1440);
+        var startDate = DateTime.UtcNow.AddMinutes(-minutes ?? -1440);
 
         var query = _dbContext.StationReadings
             .Include(sr => sr.Station)
             .Include(sr => sr.Sensor)
             .ThenInclude(s => s.SensorType)
-            .Where(sr => sr.Sensor.Station.UserId == userId && sr.SensorId == sensorId && sr.Created >= oneDayAgo)
+            .Where(sr => sr.Sensor.Station.UserId == userId && sr.SensorId == sensorId && sr.Created >= startDate)
             .OrderBy(sr => sr.Created)
             .AsQueryable();
 
-        if (groupByMinutes.HasValue)
-        {
-            query = query
-                .GroupBy(sr => new
-                {
-                    sr.Created.Year,
-                    sr.Created.Month,
-                    sr.Created.Day,
-                    sr.Created.Hour,
-                    GroupByMinutes = sr.Created.Minute / groupByMinutes.Value
-                })
-                .Select(g => new StationReading
-                {
-                    Id = g.First().Id,
-                    Value = g.Average(sr => sr.Value),
-                    Created = new DateTime(g.Key.Year, g.Key.Month, g.Key.Day, g.Key.Hour, g.Key.GroupByMinutes * groupByMinutes.Value, 0),
-                    StationId = g.First().StationId,
-                    SensorId = g.First().SensorId,
-                    Sensor = g.First().Sensor, // Ensure Sensor is included
-                    Station = g.First().Station // Ensure Station is included
-                })
-                .OrderBy(sr => sr.Created)
-                .AsQueryable();
-        }
-
         var readings = await query.ToListAsync();
 
-        
+        if (groupByMinutes.HasValue && readings.Any())
+        {
+            int interval = groupByMinutes.Value;
+            DateTime firstReadingTime = readings.First().Created;
+            DateTime intervalStartTime = new DateTime(
+                firstReadingTime.Year,
+                firstReadingTime.Month,
+                firstReadingTime.Day,
+                firstReadingTime.Hour,
+                (firstReadingTime.Minute / interval) * interval,
+                0,
+                firstReadingTime.Kind
+            );
+
+            if (intervalStartTime > firstReadingTime)
+            {
+                intervalStartTime = intervalStartTime.AddMinutes(-interval);
+            }
+
+            var groupedReadings = readings
+                .GroupBy(sr => new DateTime(
+                    intervalStartTime.Ticks + (((sr.Created.Ticks - intervalStartTime.Ticks) / TimeSpan.FromMinutes(interval).Ticks) * TimeSpan.FromMinutes(interval).Ticks),
+                    DateTimeKind.Utc))
+                .Select(g => new
+                {
+                    IntervalStart = g.Key,
+                    AverageValue = g.Average(sr => sr.Value),
+                    RepresentativeReading = g.First() // Use the first reading to get other properties like Unit, Symbol, etc.
+                })
+                .OrderBy(g => g.IntervalStart)
+                .ToList();
+
+            var result = groupedReadings.Select(g => new FullStationReadingDto(g.RepresentativeReading)
+            {
+                Value = g.AverageValue,
+                Created = g.IntervalStart
+            }).ToList();
+
+            return result;
+        }
+
         return readings.Select(sr => new FullStationReadingDto(sr)).ToList();
-        
     }
+
+
+
+
+    // public async Task<List<FullStationReadingDto>?> GetReadingsAsync(int userId, int sensorId, int? minutes = null, int? groupByMinutes = null)
+    // {
+    //     var startDate = DateTime.UtcNow.AddMinutes(-minutes ?? -1440);
+    //
+    //     var query = _dbContext.StationReadings
+    //         .Include(sr => sr.Station)
+    //         .Include(sr => sr.Sensor)
+    //         .ThenInclude(s => s.SensorType)
+    //         .Where(sr => sr.Sensor.Station.UserId == userId && sr.SensorId == sensorId && sr.Created >= startDate)
+    //         .OrderBy(sr => sr.Created)
+    //         .AsQueryable();
+    //
+    //     var readings = await query.ToListAsync();
+    //
+    //     if (groupByMinutes.HasValue)
+    //     {
+    //         int interval = groupByMinutes.Value;
+    //
+    //         var groupedReadings = readings
+    //             .GroupBy(sr => new DateTime(
+    //                 sr.Created.Year,
+    //                 sr.Created.Month,
+    //                 sr.Created.Day,
+    //                 sr.Created.Hour,
+    //                 (sr.Created.Minute / interval) * interval,
+    //                 0,
+    //                 DateTimeKind.Utc))
+    //             .Select(g => new
+    //             {
+    //                 IntervalStart = g.Key,
+    //                 AverageValue = g.Average(sr => sr.Value),
+    //                 RepresentativeReading = g.First() // We use the first reading to get other properties like Unit, Symbol, etc.
+    //             })
+    //             .OrderBy(g => g.IntervalStart)
+    //             .ToList();
+    //
+    //         var result = groupedReadings.Select(g => new FullStationReadingDto(g.RepresentativeReading)
+    //         {
+    //             Value = g.AverageValue,
+    //             Created = g.IntervalStart
+    //         }).ToList();
+    //
+    //         return result;
+    //     }
+    //
+    //     return readings.Select(sr => new FullStationReadingDto(sr)).ToList();
+    // }
+
+
+
+
+
+
+
+
+
+
     
     public async Task RecordReadingAsync(StationReadingPld reading)
     {
