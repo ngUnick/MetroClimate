@@ -24,6 +24,53 @@ services:
       - metro_climate
     profiles:
       - dev
+      - prod
+
+  db-prod:
+    container_name: metro_climate_db_prod
+    image: "postgres:14.2"
+    environment:
+      POSTGRES_USER: metro_climate
+      POSTGRES_PASSWORD: metro_climate
+      POSTGRES_DB: metro_climate_db
+    ports:
+      - "8443:5432"
+    networks:
+      - metro_climate
+    profiles:
+      - prod
+
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: metro_climate_backend
+    networks:
+      - metro_climate
+    volumes:
+      - ./MetroClimate.Backend/MetroClimate.Api/bin/Release/net8.0/linux-x64/publish:/App
+    depends_on:
+      - db-prod
+    profiles:
+      - prod
+
+  nginx:
+    container_name: metro_climate_nginx
+    image: nginx:1.21.3
+    ports:
+      - "8181:80"
+    environment:
+      - REACT_APP_API_BASE_URL=http://backend/REACT_APP_API_BASE_URL
+      - NODE_ENV=production
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d
+      - ./frontend/dist:/usr/share/nginx/html
+    networks:
+      - metro_climate
+    depends_on:
+      - backend
+    profiles:
+      - prod
 
   pgadmin:
     container_name: metro_climate_pgadmin
