@@ -8,7 +8,7 @@
 // WiFi credentials
 #include "Credentials.h"
 
-const char* stationId = "abcd567892";
+const char* stationId = "abcd567890";
 
 
 DHT dht_sensor(DHT_SENSOR_PIN, DHT_SENSOR_TYPE);
@@ -35,24 +35,46 @@ void loop() {
   if (isnan(temperatureC) || isnan(temperatureF) || isnan(humidity)) {
     Serial.println("Failed to read from DHT sensor!");
   } else {
-    if (WiFi.status() == WL_CONNECTED) {
-      HTTPClient http;
-      String postData = "{\"StationId\": \"" + String(stationId) + "\", \"SensorId\": 1, \"Value\": " + String((double)temperatureC) + ", \"SensorType\": 0, \"SensorName\": \"Temperature\"}";
+    sentData(temperatureC, 1, 0, "Temperature");
+    sentData(humidity, 2, 1, "Humidity");
+    // if (WiFi.status() == WL_CONNECTED) {
+    //   HTTPClient http;
+    //   String postData = "{\"StationId\": \"" + String(stationId) + "\", \"SensorId\": 1, \"Value\": " + String((double)temperatureC) + ", \"SensorType\": 0, \"SensorName\": \"Temperature\"}";
 
-      http.begin(wifiClient, "http://" + String(server_ip) + ":" + String(server_port) + "/Reading");
-      http.addHeader("Content-Type", "application/json");
+    //   http.begin(wifiClient, "http://" + String(server_ip) + ":" + String(server_port) + "/Reading");
+    //   http.addHeader("Content-Type", "application/json");
 
-      int httpCode = http.POST(postData);
-      String payload = http.getString();
+    //   int httpCode = http.POST(postData);
+    //   String payload = http.getString();
 
-      Serial.println(httpCode); // Print HTTP return code
-      Serial.println(payload); // Print request response payload
+    //   Serial.println(httpCode); // Print HTTP return code
+    //   Serial.println(payload); // Print request response payload
 
-      http.end(); // Close connection
-    } else {
-      Serial.println("Error in WiFi connection");
-    }
+    //   http.end(); // Close connection
+    // } else {
+    //   Serial.println("Error in WiFi connection");
+    // }
   }
 
   delay(10000); // Corrected to actually wait for 10 seconds
+}
+
+void sentData(float value, int sensorId, int sensorType, String sensorName) {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    String postData = "{\"StationId\": \"" + String(stationId) + "\", \"SensorId\": " + String(sensorId) + ", \"Value\": " + String((double)value) + ", \"SensorType\": " + String(sensorType) + ", \"SensorName\": \"" + sensorName + "\"}";
+
+    http.begin(wifiClient, "http://" + String(server_ip) + ":" + String(server_port) + "/Reading");
+    http.addHeader("Content-Type", "application/json");
+
+    int httpCode = http.POST(postData);
+    String payload = http.getString();
+
+    Serial.println(httpCode); // Print HTTP return code
+    Serial.println(payload); // Print request response payload
+
+    http.end(); // Close connection
+  } else {
+    Serial.println("Error in WiFi connection");
+  }
 }
