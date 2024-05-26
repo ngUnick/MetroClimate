@@ -66,8 +66,11 @@ public class ReadingService : IReadingService
             Value = reading.Value
         };
         
+        
+        
         _dbContext.StationReadings.Add(stationReading);
         sensor.Station.LastReceived = DateTime.UtcNow;
+        sensor.LastReceived = DateTime.UtcNow;
         _dbContext.Stations.Update(sensor.Station);
         await _dbContext.SaveChangesAsync();
     }

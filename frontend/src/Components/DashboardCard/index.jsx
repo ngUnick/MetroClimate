@@ -8,21 +8,51 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import PropTypes from "prop-types";
 
-function DashboardCard({ title, isTemp, value, online, showModal }) {
+function DashboardCard({ title, typeEnum, symbol, value, online, showModal }) {
   const [isHover, setIsHover] = useState(false);
 
+
   const handleMouseEnter = () => {
+      
      setIsHover(true);
   };
   const handleMouseLeave = () => {
      setIsHover(false);
   };
+  const typeProperties = [
+    {
+      id : 0,
+      name: 'temperature',
+      icon: faTemperatureHalf,
+      color: "#e74c3c"
+    },
+    {
+      id : 1,
+      name: 'humidity',
+      icon: faDroplet,
+      color: "#477ed6"
+    },
+    // Add other mappings as needed
+  ]
+
+  const [typeKey] = useState(typeProperties.find((type) => type.id === typeEnum));
 
   // const boxStyle = {
      
   // };
   return (
-    <Card style={{ margin: "20px", cursor: "pointer", boxShadow: isHover ? "0 4px 6px rgba(0,0,0,0.11)" : "0 2px 2px rgba(0,0,0,0.1)" }} onClick={showModal} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+    <Card
+      style={{
+        margin: "20px",
+        cursor: "pointer",
+        boxShadow: isHover
+          ? "0 4px 6px rgba(0,0,0,0.11)"
+          : "0 2px 2px rgba(0,0,0,0.1)",
+      }}
+      onClick={showModal}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <Space direction="vertical" style={{ padding: "10px" }}>
         <Space className="station-title">
           <ApartmentOutlined />
@@ -35,10 +65,15 @@ function DashboardCard({ title, isTemp, value, online, showModal }) {
         </Space>
         <Space className="station-info">
           <div>
-            {value + (isTemp ? "°C" : "%")}
-            <FontAwesomeIcon icon={isTemp ? faTemperatureHalf : faDroplet} size="xl" style={{marginLeft: "8px"}} color={isTemp ? "#e74c3c" : "#477ed6"} />
+            {value + (symbol || "")}
+            <FontAwesomeIcon
+              icon= {typeKey.icon}
+              size="xl"
+              style={{ marginLeft: "8px" }}
+              color={typeKey.color}
+            />
           </div>
-          <div style={{ fontSize: "17px"}}>More info ➟</div>
+          <div style={{ fontSize: "17px" }}>More info ➟</div>
         </Space>
       </Space>
     </Card>
@@ -47,7 +82,8 @@ function DashboardCard({ title, isTemp, value, online, showModal }) {
 
 DashboardCard.propTypes = {
   title: PropTypes.string.isRequired,
-  isTemp: PropTypes.bool.isRequired,
+  typeEnum: PropTypes.number.isRequired,
+  symbol: PropTypes.string,
   value: PropTypes.number.isRequired,
   online: PropTypes.bool.isRequired,
   showModal: PropTypes.func.isRequired,

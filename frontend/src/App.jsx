@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Space } from "antd";
 import "./App.css";
@@ -8,15 +8,21 @@ import PageContent from "./Components/PageContent";
 import Footer from "./Components/Footer";
 import Login from "./Pages/Login"
 import Register from "./Pages/Register"
+import { useNavigate } from "react-router-dom";
 
 function App() {
   // State to track if user is logged in
   const [isLoggedIn] = useState(false);
-
-
+  const navigate = useNavigate();
   const location = useLocation();
+  useEffect(() => {
+    if (localStorage.getItem("token") === null && sessionStorage.getItem("token") === null) {
+      navigate("/");
+    }
+  }, [navigate]); 
 
-  if(localStorage.getItem("token") !== null || isLoggedIn) {
+
+  if(isLoggedIn || localStorage.getItem("token") !== null || sessionStorage.getItem("token") !== null) {
     return (
       <div className="app">
       <Header />
@@ -29,7 +35,7 @@ function App() {
       );
   }
   else {
-    if (location.pathname === "/register") {
+    if (location.pathname === "/Register") {
       return (
         <div style={{height: "100dvh", width: "100dvw" , display: "flex", justifyContent: "center", alignItems: "center"}}>
           <Register />

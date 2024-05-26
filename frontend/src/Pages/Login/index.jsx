@@ -17,8 +17,8 @@ const Login = () => {
     const onFinish = async (values) => {
       console.log("Received values of form: ", values);
       try {
-        const { username, password } = values;
-        const response = await apiService.login(username, password);
+        const { username, password, remember } = values;
+        const response = await apiService.login(username, password, remember);
         messageApi.open({
           type: 'success',
           content: 'Successfully logged in',
@@ -27,7 +27,8 @@ const Login = () => {
         navigate("/");
       } catch (error) {
         //check if error is 400
-        if (error.response.status === 400) {
+        console.log(error.response)
+        if (error.response.status === 401) {
           //get the error message
           messageApi.open({
             type: 'error',

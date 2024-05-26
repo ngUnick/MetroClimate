@@ -39,8 +39,8 @@ public class UserController : ControllerBase
         
         if (token == null || user == null)
         {
-            validationResult.Errors.Add(new ValidationFailure("Username", "Invalid username or password"));
-            return new ApiResponse<LoginResponse>(ErrorCode.BadRequest, "Invalid data", validationResult);
+            validationResult.Errors.Add(new ValidationFailure("username", "Invalid username or password"));
+            return new ApiResponse<LoginResponse>(ErrorCode.Unauthorized, "Invalid data", validationResult);
         }
         
         var userDto = new UserDto(user!);

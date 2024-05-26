@@ -15,5 +15,5 @@ public class Station : IRecordable
     public User User { get; set; } = null!;
     public DateTime Created { get; set; }
     public DateTime Updated { get; set; }
-    public DateTime LastReceived { get; set; } = DateTime.UtcNow;
+    public DateTime LastReceived { get; set; }
 }

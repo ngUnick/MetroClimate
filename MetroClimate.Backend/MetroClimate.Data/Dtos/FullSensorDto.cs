@@ -10,4 +10,9 @@ public class FullSensorDto : BaseSensorDto
     {
         Readings = sensor.Readings?.Select(reading => new FullStationReadingDto(reading, sensor.SensorType)).ToList();
     }
+    
+    public FullSensorDto(Sensor sensor, double lastReading) : base(sensor, lastReading)
+    {
+        Readings = sensor.Readings?.Select(reading => new FullStationReadingDto(reading, sensor.SensorType)).ToList();
+    }
 }

@@ -20,6 +20,8 @@ public class Sensor : IRecordable
     public SensorType SensorType { get; set; } = null!;
     public List<StationReading>? Readings { get; set; }
     
+    public DateTime LastReceived { get; set; }
+    
     #endregion
     public DateTime Created { get; set; }
     public DateTime Updated { get; set; }

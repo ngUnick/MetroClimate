@@ -50,12 +50,6 @@ public class StationController : ControllerBase
         var validator = new AddStationValidator(user!, _dbContext);
         var validationResult = await validator.ValidateAsync(addStationPld);
         
-        if (Request.Headers.Authorization.Count == 0)
-        {
-            validationResult.Errors.Add(new ValidationFailure("Authorization", "Authorization header is missing"));
-            return new ApiResponse(ErrorCode.Unauthorized, "Invalid data", validationResult);
-        }
-        
         if (!validationResult.IsValid)
         {
             return new ApiResponse(ErrorCode.BadRequest, "Invalid data", validationResult);

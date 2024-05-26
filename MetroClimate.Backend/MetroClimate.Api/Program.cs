@@ -66,6 +66,17 @@ builder.Services.AddControllers(options =>
         options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
+
 builder.Services.AddTransient<IWeatherService, WeatherService>();
 builder.Services.AddTransient<IStationService, StationService>();
 builder.Services.AddTransient<IReadingService, ReadingService>();
@@ -84,6 +95,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors("AllowLocalhost");
     // Add row to the database
     // using var scope = app.Services.CreateScope();
     // var dbContext = scope.ServiceProvider.GetRequiredService<MetroClimateDbContext>();
