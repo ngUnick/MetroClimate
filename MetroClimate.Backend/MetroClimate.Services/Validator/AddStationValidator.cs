@@ -27,10 +27,8 @@ public class AddStationValidator : AbstractValidator<AddStationPld>
             .NotNull()
             .NotEmpty()
             .MinimumLength(3)
-            .MaximumLength(50);
+            .MaximumLength(20);
         RuleFor(x => x.Description)
-            .NotNull()
-            .NotEmpty()
             .MinimumLength(3)
             .MaximumLength(100);
     }

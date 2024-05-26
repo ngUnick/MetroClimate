@@ -8,7 +8,7 @@ namespace MetroClimate.Services.Services;
 
 public interface IReadingService
 {
-    Task<List<FullStationReadingDto>?> GetReadingsAsync(int userId, int sensorId);
+    Task<List<FullStationReadingDto>?> GetReadingsAsync(int userId, int sensorId, int? minutes = null, int? groupByMinutes = null);
     Task RecordReadingAsync(StationReadingPld reading);
 }
 
@@ -22,15 +22,45 @@ public class ReadingService : IReadingService
     }
 
 
-    public async Task<List<FullStationReadingDto>?> GetReadingsAsync(int userId, int sensorId)
+    public async Task<List<FullStationReadingDto>?> GetReadingsAsync(int userId, int sensorId, int? minutes = null , int? groupByMinutes = null)
     {
-        var readings = await _dbContext.StationReadings
+        var oneDayAgo = DateTime.UtcNow.AddMinutes(-minutes ?? -1440);
+
+        var query = _dbContext.StationReadings
             .Include(sr => sr.Station)
             .Include(sr => sr.Sensor)
             .ThenInclude(s => s.SensorType)
-            .Where(sr => sr.Sensor.Station.UserId == userId && sr.SensorId == sensorId)
-            .OrderByDescending(sr => sr.Created)
-            .ToListAsync();
+            .Where(sr => sr.Sensor.Station.UserId == userId && sr.SensorId == sensorId && sr.Created >= oneDayAgo)
+            .OrderBy(sr => sr.Created)
+            .AsQueryable();
+
+        if (groupByMinutes.HasValue)
+        {
+            query = query
+                .GroupBy(sr => new
+                {
+                    sr.Created.Year,
+                    sr.Created.Month,
+                    sr.Created.Day,
+                    sr.Created.Hour,
+                    GroupByMinutes = sr.Created.Minute / groupByMinutes.Value
+                })
+                .Select(g => new StationReading
+                {
+                    Id = g.First().Id,
+                    Value = g.Average(sr => sr.Value),
+                    Created = new DateTime(g.Key.Year, g.Key.Month, g.Key.Day, g.Key.Hour, g.Key.GroupByMinutes * groupByMinutes.Value, 0),
+                    StationId = g.First().StationId,
+                    SensorId = g.First().SensorId,
+                    Sensor = g.First().Sensor, // Ensure Sensor is included
+                    Station = g.First().Station // Ensure Station is included
+                })
+                .OrderBy(sr => sr.Created)
+                .AsQueryable();
+        }
+
+        var readings = await query.ToListAsync();
+
         
         return readings.Select(sr => new FullStationReadingDto(sr)).ToList();
         

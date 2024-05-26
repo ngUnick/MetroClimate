@@ -1,21 +1,28 @@
 import { useEffect, useState } from "react";
-import { Typography, Modal, Card, Form, Input, InputNumber } from "antd";
+import { Typography, Modal, Card, Form, Input } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import StationCard from "../../Components/StationCard";
 import apiService from "../../ApiService";
+import { message } from "antd";
+
 
 function Stations() {
   const [open, setOpen] = useState(false);
   const [stations, setStations] = useState([]);
+  const [form] = Form.useForm();
+  const [messageApi, contextHolder] = message.useMessage();
 
   const showModal = () => {
     setOpen(true);
   };
-  const handleOk = () => {
-    setOpen(false);
-  };
+
   const handleCancel = () => {
     setOpen(false);
+  };
+
+  const onOk = () => {
+    //sumbit form
+    form.submit();
   };
 
   const [isHover, setIsHover] = useState(false);
@@ -28,9 +35,38 @@ function Stations() {
   };
 
 
-  const onFinish = (values) => {
-    console.log('Success:', values);
+  const onFinish = async (values) => {
+    //check form validation before submitting
+
+    console.log('Received values of form: ', values);
+    try {
+      const payload = {
+        id: values.id,
+        name: values.name,
+        description: values.description,
+      }
+      const response = await apiService.post("/Station", payload);
+      console.log(response);
+      fetchStations();
+      setOpen(false);
+
+    } catch (error) {
+      //check if error is 400
+      if (error.response.status === 400) {
+        const { validationErrors } = error.response.data;
+        form.setFields(Object.keys(validationErrors).map(key => ({
+          name: key,
+          errors: validationErrors[key],
+        })));
+      } else {
+        messageApi.open({
+          type: 'error',
+          content: 'There was an error while registering',
+        });
+      }
+    }
   };
+
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
@@ -52,7 +88,7 @@ function Stations() {
   return (
     <div>
       <Typography.Title level={1}>Stations</Typography.Title>
-      <div style={{ display: "flex", flexDirection: "row" }}>
+      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
         
         {stations.map((station) => (
           <StationCard
@@ -110,7 +146,7 @@ function Stations() {
             </Typography.Title>
           }
           open={open}
-          onOk={handleOk}
+          onOk={onOk}
           onCancel={handleCancel}
           footer={(_, { OkBtn, CancelBtn  }) => (
             <>
@@ -132,6 +168,7 @@ function Stations() {
           >
             <Form
               name="basic"
+              form={form}
               labelCol={{
                 span: 8,
               }}
@@ -149,17 +186,18 @@ function Stations() {
               onFinishFailed={onFinishFailed}
               autoComplete="off"
             >
+              {contextHolder}
                 <Form.Item
                 label="ID"
                 name="id"
                 rules={[
                   {
                     required: true,
-                    message: "Please input a name!",
+                    message: "Please input an ID!",
                   },
                 ]}
               >
-                <InputNumber min={1} max={10} defaultValue={1} />
+                <Input/>
               </Form.Item>
                 
               <Form.Item
@@ -180,8 +218,8 @@ function Stations() {
                 name="description"
                 rules={[
                   {
-                    required: true,
-                    message: "Please input your password!",
+                    required: false,
+                    message: "Please input a description!",
                   },
                 ]}
                 style={{marginLeft: "-6px"}}

@@ -5,7 +5,7 @@ import "./App.css";
 import Header from "./Components/Header";
 import SideMenu from "./Components/SideMenu";
 import PageContent from "./Components/PageContent";
-import Footer from "./Components/Footer";
+// import Footer from "./Components/Footer";
 import Login from "./Pages/Login"
 import Register from "./Pages/Register"
 import { useNavigate } from "react-router-dom";
@@ -16,10 +16,10 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
   useEffect(() => {
-    if (localStorage.getItem("token") === null && sessionStorage.getItem("token") === null) {
+    if (localStorage.getItem("token") === null && sessionStorage.getItem("token") === null && location.pathname !== "/Register") {
       navigate("/");
     }
-  }, [navigate]); 
+  }, [navigate, location.pathname]);
 
 
   if(isLoggedIn || localStorage.getItem("token") !== null || sessionStorage.getItem("token") !== null) {
@@ -30,7 +30,7 @@ function App() {
           <SideMenu />
           <PageContent />
         </Space>
-        <Footer />
+        {/* <Footer /> */}
       </div>
       );
   }

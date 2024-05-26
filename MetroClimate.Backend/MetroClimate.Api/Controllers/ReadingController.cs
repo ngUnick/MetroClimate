@@ -40,7 +40,7 @@ public class ReadingController : ControllerBase
             return new ApiResponse<IEnumerable<FullStationReadingDto>?>(ErrorCode.BadRequest, "Invalid data", validationResult);
         }
 
-        return new ApiResponse<IEnumerable<FullStationReadingDto>?>(await _readingService.GetReadingsAsync(user!.Id, payload.SensorId));
+        return new ApiResponse<IEnumerable<FullStationReadingDto>?>(await _readingService.GetReadingsAsync(user!.Id, payload.SensorId, payload.Minutes, payload.GroupByMinutes));
     }
     
     [HttpPost(Name = "SentStationReading")]
