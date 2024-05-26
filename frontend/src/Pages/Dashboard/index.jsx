@@ -17,6 +17,7 @@ function Dashboard() {
   const [sensorName, setSensorName] = useState(null);
   const [config, setConfig] = useState({});
   const [sensorId, setSensorId] = useState(null);
+  const [groupBy, setGroupBy] = useState(60);
 
   // const dataO = [
   //   { time: '1991', value: 3 },
@@ -31,8 +32,10 @@ function Dashboard() {
   // ];
 
   const groupByOptions = {
-    none: null,
     minute: 1,
+    fiveminute: 5,
+    tenminute: 10,
+    fifteenminute: 15,
     halfhour: 30,
     hour: 60,
     twohour: 120,
@@ -44,8 +47,9 @@ function Dashboard() {
     setSensorName(name);
     setSensorId(id);
     setOpen(true);
+    const minute = groupBy;
    
-    fetchSensorData(id).then((data) => {
+    fetchSensorData(id,minute).then((data) => {
       //group data by hour and get average value and add time to it
       const processedData = processSensorData(data);
       const processedDataConfig  = {
@@ -78,9 +82,11 @@ function Dashboard() {
 
   const onGroupByChange = (e) => {
     
-    const minutes = groupByOptions[e.target.value];
+    setGroupBy(groupByOptions[e.target.value]);
 
-    fetchSensorData(sensorId, minutes).then((data) => {
+    const minute = groupByOptions[e.target.value];
+
+    fetchSensorData(sensorId, minute).then((data) => {
       //group data by hour and get average value and add time to it
       const processedData = processSensorData(data);
       const processedDataConfig  = {
@@ -191,16 +197,16 @@ function Dashboard() {
         {//add dropdown here to select group by
         }
         <Typography.Title level={3} style={{marginRight: "10px"}}>Group By:</Typography.Title>
-        <select onChange={onGroupByChange}>
-            <option value="none">None</option>
+        <select onChange={onGroupByChange} defaultValue="hour">
+            
             <option value="minute">Minute</option>
-            <option value="halfhour">Half Hour</option>
+            <option value="fiveminute">5 Minutes</option>
+            <option value="tenminute">10 Minutes</option>
+            <option value="fifteenminute">15 Minutes</option>
             <option value="hour">Hour</option>
+            <option value="halfhour">Half Hour</option>
             <option value="twohour">Two Hours</option>
             <option value="fourhour">Four Hours</option>
-            {/* <option value="day">Day</option>
-            <option value="week">Week</option>
-            <option value="month">Month</option> */}
         </select>
         <div style={{ display: "flex", flexDirection: "row", margin: "40px 20px 10px"}}>
           
