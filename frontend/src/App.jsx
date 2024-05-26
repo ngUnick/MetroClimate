@@ -11,11 +11,12 @@ import Register from "./Pages/Register"
 
 function App() {
   // State to track if user is logged in
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn] = useState(false);
+
 
   const location = useLocation();
 
-  if(isLoggedIn) {
+  if(localStorage.getItem("token") !== null || isLoggedIn) {
     return (
       <div className="app">
       <Header />
@@ -28,19 +29,20 @@ function App() {
       );
   }
   else {
-    if (location.pathname === "/") {
+    if (location.pathname === "/register") {
       return (
         <div style={{height: "100dvh", width: "100dvw" , display: "flex", justifyContent: "center", alignItems: "center"}}>
-          <Login />
+          <Register />
         </div>
       );
     }
     else {
       return (
         <div style={{height: "100dvh", width: "100dvw" , display: "flex", justifyContent: "center", alignItems: "center"}}>
-          <Register />
+          <Login />
         </div>
       );
+      
     }
     
   }

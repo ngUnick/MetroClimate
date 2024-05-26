@@ -1,19 +1,20 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Badge, Card, Space } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSatelliteDish } from "@fortawesome/free-solid-svg-icons";
+import PropTypes from "prop-types";
 
-function StationCard({ title, description, online, showModal }) {
-  const [isHover, setIsHover] = useState(false);
+function StationCard({ title, description, online}) {
+  const [isHover] = useState(false);
 
-  const handleMouseEnter = () => {
-    setIsHover(true);
-  };
-  const handleMouseLeave = () => {
-    setIsHover(false);
-  };
+  // const handleMouseEnter = () => {
+  //   setIsHover(true);
+  // };
+  // const handleMouseLeave = () => {
+  //   setIsHover(false);
+  // };
 
-  const boxStyle = {};
+  // const boxStyle = {};
   return (
     <Card
       style={{
@@ -51,5 +52,11 @@ function StationCard({ title, description, online, showModal }) {
     </Card>
   );
 }
+
+StationCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  online: PropTypes.bool.isRequired,
+};
 
 export default StationCard;

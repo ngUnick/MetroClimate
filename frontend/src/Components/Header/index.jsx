@@ -1,9 +1,9 @@
 import { Badge, Image, Space, Typography, Avatar } from "antd";
-import { UserOutlined, BellFilled } from "@ant-design/icons";
+import { UserOutlined} from "@ant-design/icons";
 import logo from "../../assets/original_logo.png"
 
 function Header() {
-  const name = "Nick";
+  const name = localStorage.getItem("username");
   return (
     <div className="header">
       <Image

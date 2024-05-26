@@ -1,7 +1,8 @@
-import React, { useEffect, useContext } from "react";
+import { useEffect} from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, message, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
+import apiService from '../../ApiService';
 
 
 const Login = () => {
@@ -15,23 +16,31 @@ const Login = () => {
   
     const onFinish = async (values) => {
       console.log("Received values of form: ", values);
-    //   try {
-    //     const {username , password} = values;
-    //     const token = await AuthAPI.login(username, password);
-    //     messageApi.open({
-    //       type: 'success',
-    //       content: 'Successfully login',
-    //     });
-    //     console.log(token);
-    //     login(token);
-    //     navigate("/")
-    //   } catch (error) {
-    //     messageApi.open({
-    //       type: 'error',
-    //       content: 'Wrong username or password',
-    //     });
-    //     console.log("lathos onoma h kodikos");
-    //   }
+      try {
+        const { username, password } = values;
+        const response = await apiService.login(username, password);
+        messageApi.open({
+          type: 'success',
+          content: 'Successfully logged in',
+        });
+        console.log(response.data.token);
+        navigate("/");
+      } catch (error) {
+        //check if error is 400
+        if (error.response.status === 400) {
+          //get the error message
+          messageApi.open({
+            type: 'error',
+            content: error.response.data.validationErrors.username[0] 
+          });
+        }
+        else {
+          messageApi.open({
+            type: 'error',
+            content: 'There was an error while logging in'
+          });
+        }
+      }
     };
   
     return (

@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Typography, Modal, Card, Form, Input, InputNumber } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import StationCard from "../../Components/StationCard";
+import apiService from "../../ApiService";
 
 function Stations() {
   const [open, setOpen] = useState(false);
+  const [stations, setStations] = useState([]);
+
   const showModal = () => {
     setOpen(true);
   };
@@ -32,21 +35,35 @@ function Stations() {
     console.log('Failed:', errorInfo);
   };
 
+  const fetchStations = async () => {
+    const response = await apiService.get("/Station");
+    setStations(response.data.data);
+  };
+
+  useEffect(() => {
+    fetchStations();
+  }, []);
+
 
 
   const description =
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+    "N/A";
 
   return (
     <div>
       <Typography.Title level={1}>Stations</Typography.Title>
       <div style={{ display: "flex", flexDirection: "row" }}>
-        <StationCard
-          title={"Station 1"}
-          online={true}
-          description={description}
-          // showModal={showModal}
-        />
+        
+        {stations.map((station) => (
+          <StationCard
+            key={station.id}
+            title={station.name}
+            online={station.online}
+            description={station.description || description}
+            // showModal={showModal}
+          />
+        ))}
+        
         <Card
           style={{
             width: "500px",
@@ -80,6 +97,7 @@ function Stations() {
             Add New Station
           </Typography.Title>
         </Card>
+        
 
 
 
