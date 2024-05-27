@@ -1,8 +1,10 @@
 import { Typography, Button } from "antd";
+import apiService from "../../ApiService";
 
 function Settings() {
   const handleLogout = () => {
-    console.log("User logged out");
+    apiService.logout();
+    window.location.reload();
   };
 
   return (

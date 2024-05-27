@@ -17,7 +17,7 @@ function SideMenu() {
         items={[
           {
             label: "Dashboard",
-            key: "/dashboard",
+            key: "/",
             icon:<AppstoreOutlined style={{fontSize: "18px"}}/>,
           },
           {

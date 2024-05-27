@@ -1,18 +1,28 @@
-import { useState } from "react";
-import { Typography, Modal, Card, Form, Input, InputNumber } from "antd";
+import { useEffect, useState } from "react";
+import { Typography, Modal, Card, Form, Input } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import StationCard from "../../Components/StationCard";
+import apiService from "../../ApiService";
+import { message } from "antd";
+
 
 function Stations() {
   const [open, setOpen] = useState(false);
+  const [stations, setStations] = useState([]);
+  const [form] = Form.useForm();
+  const [messageApi, contextHolder] = message.useMessage();
+
   const showModal = () => {
     setOpen(true);
   };
-  const handleOk = () => {
-    setOpen(false);
-  };
+
   const handleCancel = () => {
     setOpen(false);
+  };
+
+  const onOk = () => {
+    //sumbit form
+    form.submit();
   };
 
   const [isHover, setIsHover] = useState(false);
@@ -25,28 +35,71 @@ function Stations() {
   };
 
 
-  const onFinish = (values) => {
-    console.log('Success:', values);
+  const onFinish = async (values) => {
+    //check form validation before submitting
+
+    console.log('Received values of form: ', values);
+    try {
+      const payload = {
+        id: values.id,
+        name: values.name,
+        description: values.description,
+      }
+      const response = await apiService.post("/Station", payload);
+      console.log(response);
+      fetchStations();
+      setOpen(false);
+
+    } catch (error) {
+      //check if error is 400
+      if (error.response.status === 400) {
+        const { validationErrors } = error.response.data;
+        form.setFields(Object.keys(validationErrors).map(key => ({
+          name: key,
+          errors: validationErrors[key],
+        })));
+      } else {
+        messageApi.open({
+          type: 'error',
+          content: 'There was an error while registering',
+        });
+      }
+    }
   };
+
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
 
+  const fetchStations = async () => {
+    const response = await apiService.get("/Station");
+    setStations(response.data.data);
+  };
+
+  useEffect(() => {
+    fetchStations();
+  }, []);
+
 
 
   const description =
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+    "N/A";
 
   return (
     <div>
       <Typography.Title level={1}>Stations</Typography.Title>
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        <StationCard
-          title={"Station 1"}
-          online={true}
-          description={description}
-          // showModal={showModal}
-        />
+      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+        
+        {stations.map((station) => (
+          <StationCard
+            key={station.id}
+            title={station.name}
+            online={station.online}
+            description={station.description || description}
+            // showModal={showModal}
+          />
+        ))}
+        
         <Card
           style={{
             width: "500px",
@@ -80,6 +133,7 @@ function Stations() {
             Add New Station
           </Typography.Title>
         </Card>
+        
 
 
 
@@ -92,7 +146,7 @@ function Stations() {
             </Typography.Title>
           }
           open={open}
-          onOk={handleOk}
+          onOk={onOk}
           onCancel={handleCancel}
           footer={(_, { OkBtn, CancelBtn  }) => (
             <>
@@ -114,6 +168,7 @@ function Stations() {
           >
             <Form
               name="basic"
+              form={form}
               labelCol={{
                 span: 8,
               }}
@@ -131,17 +186,18 @@ function Stations() {
               onFinishFailed={onFinishFailed}
               autoComplete="off"
             >
+              {contextHolder}
                 <Form.Item
                 label="ID"
                 name="id"
                 rules={[
                   {
                     required: true,
-                    message: "Please input a name!",
+                    message: "Please input an ID!",
                   },
                 ]}
               >
-                <InputNumber min={1} max={10} defaultValue={1} />
+                <Input/>
               </Form.Item>
                 
               <Form.Item
@@ -162,8 +218,8 @@ function Stations() {
                 name="description"
                 rules={[
                   {
-                    required: true,
-                    message: "Please input your password!",
+                    required: false,
+                    message: "Please input a description!",
                   },
                 ]}
                 style={{marginLeft: "-6px"}}

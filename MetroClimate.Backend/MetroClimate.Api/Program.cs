@@ -29,7 +29,7 @@ builder.Services.AddDbContext<MetroClimateDbContext>(options =>
             x => x.MigrationsHistoryTable(tableName: "migrations_history",
                 schema: builder.Configuration.GetConnectionString(name: "Schema")))
         .UseSnakeCaseNamingConvention());
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")!));
+// builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")!));
 
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -66,6 +66,17 @@ builder.Services.AddControllers(options =>
         options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
+
 builder.Services.AddTransient<IWeatherService, WeatherService>();
 builder.Services.AddTransient<IStationService, StationService>();
 builder.Services.AddTransient<IReadingService, ReadingService>();
@@ -84,6 +95,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors("AllowLocalhost");
     // Add row to the database
     // using var scope = app.Services.CreateScope();
     // var dbContext = scope.ServiceProvider.GetRequiredService<MetroClimateDbContext>();
@@ -97,6 +109,15 @@ if (app.Environment.IsDevelopment())
     using var scope = app.Services.CreateScope();
     var dataSeeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
     await dataSeeder.Seed();
+    
+}
+
+if (!app.Environment.IsDevelopment())
+{
+    //migration
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<MetroClimateDbContext>();
+    await dbContext.Database.MigrateAsync();
     
 }
 

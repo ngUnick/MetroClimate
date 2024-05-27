@@ -9,5 +9,21 @@
       <jdbc-url>jdbc:postgresql://localhost:8442/metro_climate_db?password=metro_climate&amp;user=metro_climate</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="metro_climate_db@localhost [2]" uuid="33938c4e-f636-49d3-b831-691d9232feb8">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:8443/metro_climate_db?password=metro_climate&amp;user=metro_climate</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="metro_climate_db@192.168.1.17" uuid="465e7e12-094b-489a-8a69-469dcb903db4">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://192.168.1.17:8443/metro_climate_db?password=metro_climate&amp;user=metro_climate</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

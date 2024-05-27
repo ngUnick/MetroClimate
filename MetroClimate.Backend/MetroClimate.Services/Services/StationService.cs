@@ -24,15 +24,35 @@ public class StationService : IStationService
 
     public async Task<List<StationDto>?> GetUserStationsAsync(int userId)
     {
-        var station = await _dbContext.Stations
-            .Include(s => s.Sensors)!
-            .ThenInclude(s => s.Readings)
+        // Step 1: Retrieve the stations and their sensors associated with the user
+        var stations = await _dbContext.Stations
             .Include(s => s.Sensors)!
             .ThenInclude(s => s.SensorType)
             .Where(s => s.UserId == userId)
             .ToListAsync();
+
+        // Step 2: Get the sensor IDs from the stations
+        var sensorIds = stations
+            .SelectMany(s => s.Sensors!)
+            .Select(sensor => sensor.Id)
+            .ToList();
+
+        // Step 3: Retrieve the latest value for each sensor
+        var latestValuesOfEachSensorOfEachStation = await _dbContext.StationReadings
+            .Where(sr => sensorIds.Contains(sr.SensorId))
+            .GroupBy(sr => sr.SensorId)
+            .Select(g => g.OrderByDescending(sr => sr.Created).FirstOrDefault())
+            .ToListAsync();
+
+
         
-        var stationDtos = station.Select(s => new StationDto(s)).ToList();
+        var stationDtos = stations.Select(station =>
+        {
+            var latestValues = latestValuesOfEachSensorOfEachStation
+                .Where(sr => station.Sensors!.Select(s => s.Id).Contains(sr.SensorId))
+                .ToList();
+            return new StationDto(station, latestValues);
+        }).ToList();
         
         return stationDtos;
         

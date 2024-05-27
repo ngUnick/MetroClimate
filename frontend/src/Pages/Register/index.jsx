@@ -1,6 +1,6 @@
-import React from 'react';
 import { Form, Input, Button, message, Typography } from 'antd';
 import { useNavigate } from "react-router-dom";
+import apiService from '../../ApiService';
 
 const formItemLayout = {
   labelCol: {
@@ -27,19 +27,30 @@ const Register = () => {
 
   const onFinish = async (values) => {
     console.log('Received values of form: ', values);
-    // try {
-    //   await AuthAPI.register(values.username, values.email, values.password);
-    //   messageApi.open({
-    //     type: 'success',
-    //     content: 'Successfully register',
-    //   });
-    //   navigate('/login')
-    // } catch (error) {
-    //   messageApi.open({
-    //     type: 'error',
-    //     content: 'Error on registration',
-    //   });
-    // }
+    try {
+
+      const response = await apiService.register(values.username, values.email, values.password, values.confirm);
+      messageApi.open({
+        type: 'success',
+        content: 'Successfully registered',
+      });
+      console.log(response.data.token);
+      navigate("/");
+    } catch (error) {
+      //check if error is 400
+      if (error.response.status === 400) {
+        const { validationErrors } = error.response.data;
+        form.setFields(Object.keys(validationErrors).map(key => ({
+          name: key,
+          errors: validationErrors[key],
+        })));
+      } else {
+        messageApi.open({
+          type: 'error',
+          content: 'There was an error while registering',
+        });
+      }
+    }
   };
 
   return (
@@ -66,6 +77,19 @@ const Register = () => {
               {
                 required: true,
                 message: 'Please input your username!',
+                whitespace: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="email"
+            label="E-mail"
+            rules={[
+              {
+                required: true,
+                message: 'Please input your E-mail!',
                 whitespace: true,
               },
             ]}

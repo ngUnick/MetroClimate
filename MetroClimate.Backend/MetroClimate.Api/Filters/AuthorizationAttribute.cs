@@ -29,7 +29,7 @@ public class AuthorizationAttribute : ActionFilterAttribute
         if (user == null)
         {
             validationResult.Errors.Add(new ValidationFailure("Authorization", "Invalid token"));
-            context.Result = new JsonResult(new ApiResponse<IEnumerable<FullStationReadingDto>?>(ErrorCode.Unauthorized, "Unauthorized", validationResult));
+            context.Result = new ApiResponse<IEnumerable<FullStationReadingDto>?>(ErrorCode.Unauthorized, "Unauthorized", validationResult);
             return;
         }
         
