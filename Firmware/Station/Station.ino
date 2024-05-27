@@ -12,7 +12,8 @@ const char* stationId = "abcd567890";
 
 
 DHT dht_sensor(DHT_SENSOR_PIN, DHT_SENSOR_TYPE);
-WiFiClient wifiClient;
+// WiFiClient wifiClient;
+WiFiClientSecure wifiClient;
 
 void setup() {
   Serial.begin(115200);
@@ -64,7 +65,9 @@ void sentData(float value, int sensorId, int sensorType, String sensorName) {
     HTTPClient http;
     String postData = "{\"StationId\": \"" + String(stationId) + "\", \"SensorId\": " + String(sensorId) + ", \"Value\": " + String((double)value) + ", \"SensorType\": " + String(sensorType) + ", \"SensorName\": \"" + sensorName + "\"}";
 
-    http.begin(wifiClient, "http://" + String(server_ip) + ":" + String(server_port) + "/Reading");
+    wifiClient.setInsecure();
+    http.begin(wifiClient, String(server_ip) + "/Reading");
+    // Serial.println(String(server_ip) + "/Reading");
     http.addHeader("Content-Type", "application/json");
 
     int httpCode = http.POST(postData);
