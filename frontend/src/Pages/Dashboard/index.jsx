@@ -128,7 +128,8 @@ function Dashboard() {
   }, []);
 
   const fetchSensorData = async (sensorId, groupByMinutes) => {
-    const response = await apiService.get("/Reading", {sensorId, groupByMinutes});
+    const minutes = 1339;
+    const response = await apiService.get("/Reading", {sensorId, minutes, groupByMinutes});
     return response.data.data;
   }
 
